@@ -30,3 +30,5 @@ Meeting Agenda templates (located in the `/docs` directory in this repo):
 ## Our Team
 
 - Raghad Sharaf (Primary Product Owner): [GitHub](https://github.com/Raghad-Sharaf) / [LinkedIn](https://linkedin.com/in/raghad-sharaf)
+
+- Anas Ahmad (Web developer): [GitHub](https://github.com/martiNik2)
