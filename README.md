@@ -32,3 +32,5 @@ Meeting Agenda templates (located in the `/docs` directory in this repo):
 - Raghad Sharaf (Primary Product Owner): [GitHub](https://github.com/Raghad-Sharaf) / [LinkedIn](https://linkedin.com/in/raghad-sharaf)
 
 - Anas Ahmad (Web developer): [GitHub](https://github.com/martiNik2)
+
+- Deema Wazwaz (UI/UX designer): [GitHub](https://github.com/deemawazwaz) / [LinkedIn](https://www.linkedin.com/in/deema-wazwaz-0a7b272b3/)
