@@ -36,3 +36,5 @@ Meeting Agenda templates (located in the `/docs` directory in this repo):
 - Deema Wazwaz (UI/UX designer): [GitHub](https://github.com/deemawazwaz) / [LinkedIn](https://www.linkedin.com/in/deema-wazwaz-0a7b272b3/)
   
 - Mayar Waleed Nawas (Web developer): [GitHub](https://github.com/myarnwas) / [LinkedIn](https://www.linkedin.com/in/mayar-waleed-nawas/)
+
+- Fouad Adel ALShami (Web developer): [GitHub](https://github.com/itsfouad1) / [LinkedIn](https://www.linkedin.com/in/fouad-shami04/)
