@@ -10,9 +10,9 @@ sentences.
 Each team member should Place an 'X' under their name to vote for the ideas 
 you like the best.
 
-| Project Idea | Description | teammate name | teammate name | teammate name | teammate name | teammate name | teammate name |
+| Project Idea | Description | Mayar Waleed Nawas | teammate name | teammate name | teammate name | teammate name | teammate name |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| First idea | Description | | | | | | |
-| Second idea | Description | | | | | | |
+| Interactive AI Career Path & Adaptive Skill Nodes | A visual roadmap generator that breaks career goals into sequential skill nodes, allowing users to toggle resources, test knowledge, and dynamically regenerate specific weak steps. |X | | | | | |
+| AI-Powered Dev-Path Generator with Multi-Resource Curation | A personalized learning roadmap app that uses AI to analyze user background, output targeted skill milestones, and curate tailored free tutorials, documentation, and videos for each step. |X | | | | | |
 | ... | Description | | | | | | |
 | Last idea | Description | | | | | | |
