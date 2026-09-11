@@ -27,6 +27,35 @@ Meeting Agenda templates (located in the `/docs` directory in this repo):
 - Meeting - Sprint Retrospective, Review, and Planning --> ./docs/meeting-sprint_retrospective_review_and_planning.docx
 - Meeting - Sprint Open Topic Session --> ./docs/meeting-sprint_open_topic_session.docx
 
+## How to setup 
+
+To get the application running on your local machine, follow these steps:
+
+1. clone the repository:
+
+```
+git clone git@github.com:chingu-voyages/V62-tier2-team-22.git
+```
+
+2. Go inside the directory and install the required packages with npm
+
+```
+cd V62-tier2-team-22
+npm install
+```
+
+3. Create a .env file and configure it according to the .env.example provided
+
+```
+touch .env
+```
+
+4. Launch the development server
+
+```
+npm run dev
+```
+
 ## Our Team
 
 - Raghad Sharaf (Primary Product Owner): [GitHub](https://github.com/Raghad-Sharaf) / [LinkedIn](https://linkedin.com/in/raghad-sharaf)
