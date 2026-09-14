@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-	"postinstall":"prisma generate"
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.0",
@@ -20,14 +20,17 @@
     "zod": "^4.6.1"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
+    "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "autoprefixer": "^10.6.0",
     "eslint": "^9",
     "eslint-config-next": "16.3.4",
+    "postcss": "^8.5.28",
     "prisma": "^7.10.0",
-    "tailwindcss": "^4",
+    "tailwind": "^4.0.0",
+    "tailwindcss": "^4.3.3",
     "tsx": "^4.23.13",
     "typescript": "^5"
   }
