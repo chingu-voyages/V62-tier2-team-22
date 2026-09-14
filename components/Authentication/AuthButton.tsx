@@ -1,5 +1,6 @@
 'use client'
 
+import Link from "next/link"
 import {getSession, signIn,signOut,useSession} from "next-auth/react"
 
 export function SignInButtons(){
@@ -40,6 +41,11 @@ export function AuthStatus(){
 				<span>{session.user.name}</span>
 				<SignOutButton/>
 			</div>
+		)
+	}
+	else{
+		return (
+			<Link href="/login">Login</Link>
 		)
 	}
 }
