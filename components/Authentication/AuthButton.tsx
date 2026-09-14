@@ -2,12 +2,18 @@
 
 import {getSession, signIn,signOut,useSession} from "next-auth/react"
 
-export function GoogleSignInButton(){
+export function SignInButtons(){
 	return (
-		<button
-			onClick={()=>signIn("google")}
-			//implement styles here
-			>Sign in with Google</button>
+		<div>
+			<button
+				onClick={()=>signIn("google",{redirectTo:"/"})}
+				//implement styles here
+				>Sign in with Google</button>
+			<button
+				onClick={()=>signIn("github",{redirectTo:"/"})}
+				//implement styles here
+				>Sign in with Github</button>
+		</div>
 	)
 }
 
@@ -33,13 +39,6 @@ export function AuthStatus(){
 			<div className="flex items-center gap-3">
 				<span>{session.user.name}</span>
 				<SignOutButton/>
-			</div>
-		)
-	}
-	else{
-		return (
-			<div className="flex items-center gap-3">
-				<GoogleSignInButton/>
 			</div>
 		)
 	}
