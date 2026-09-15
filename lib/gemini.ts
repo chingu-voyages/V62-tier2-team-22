@@ -2,7 +2,10 @@ import { GoogleGenAI } from "@google/genai";
 
 
 export default async function queryAi(query:string):Promise<string>{
-	const ai =new GoogleGenAI({})
+	const ai =new GoogleGenAI({
+		apiKey: process.env.GEMINI_API_KEY,
+
+	})
 
 
 	const interaction = await ai.interactions.create({
