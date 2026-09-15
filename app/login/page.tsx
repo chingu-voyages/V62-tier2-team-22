@@ -1,5 +1,6 @@
 'use client'
 
+import { Suspense } from "react";
 import {  SignInButtons} from "@/components/Authentication/AuthButton";
 import { useSearchParams } from "next/navigation";
 
@@ -10,7 +11,7 @@ const ERROR_MESSAGES:Record<string,string> = {
 	Default: "An error occurred during sign-in. Please try again.",
 }
 
-export default function LoginPage(){
+export function LoginContent(){
 	const searchParams=useSearchParams()
 	const errorKey=searchParams.get("error")
 
@@ -25,5 +26,13 @@ export default function LoginPage(){
 			)}
 			<SignInButtons/>	
 		</div>
+	)
+}
+
+export default function LoginPage(){
+	return (
+		<Suspense fallback={<div>Loading login options...</div>}>
+			<LoginContent/>
+		</Suspense>
 	)
 }
