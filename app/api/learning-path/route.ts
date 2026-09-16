@@ -1,7 +1,9 @@
 import {NextResponse} from "next/server";
 import {learningPathRequestSchemas} from "@/schemas/formSchemas";
 import queryAi from "@/lib/gemini";
-import { buildLearningPathPrompt , learningPathResponseSchema} from "@/lib/learning-path";
+import { buildLearningPathPrompt} from "@/lib/learning-path";
+import {learningPathResponseSchema} from "@/schemas/learningPathSchemas";
+
 
 
 export async function POST(request: Request) {
