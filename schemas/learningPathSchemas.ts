@@ -10,7 +10,7 @@ export const learningStepsSchema = z.object({
 
 export const learningPathResponseSchema = z.object({
     targetRole: z.string().trim().min(1),
-    steps: z.array(learningStepsSchema).min(2),
+    steps: z.array(learningStepsSchema).min(3).max(10),
 })
 
 

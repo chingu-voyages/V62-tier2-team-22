@@ -44,13 +44,16 @@ Return only valid JSON in this format:
 }
 
 Requirements:
-- Include at least 2 ordered learning steps.
+- Generate between 3 and 10 ordered learning steps.
 - Give each step a clear and specific title.
-- Clearly describe what the learner should learn or accomplish.
+- Focus each step on one main skill or learning outcome.
+- Do not combine multiple complex subjects into one step.
+- Split large or advanced subjects into separate steps.
+- Keep each description concise and focused on what the learner should accomplish.
 - Explain why each step matters for reaching the learner's career goal.
-- Provide a realistic estimated time for each step.
+- Provide a short and realistic estimated time for each step.
 - Base the time estimates on the learner's available weekly hours and target timeframe.
-- Include enough information for the learner to understand what is expected at each stage.
+- Make sure the combined time estimates fit within the learner's target timeframe.
 - Personalize every step using all provided learner information.
 - Do not include Markdown or text outside the JSON.
 `.trim();
