@@ -1,16 +1,4 @@
-import {z} from "zod";
-import type {learningPathRequest} from "../schemas/formSchemas";
-
-
-export const learningStepsSchema = z.object({
-    position: z.number().int().positive(),
-    title: z.string().trim().min(1),
-})
-
-export const learningPathResponseSchema = z.object({
-    targetRole: z.string().trim().min(1),
-    steps: z.array(learningStepsSchema).min(2),
-})
+import type { learningPathRequest } from "../schemas/formSchemas";
 
 export function buildLearningPathPrompt(
   data: learningPathRequest
@@ -47,21 +35,24 @@ Return only valid JSON in this format:
   "steps": [
     {
       "position": 1,
-      "title": "Step title"
+      "title": "Step title",
+      "description": "What the learner should learn or accomplish in this step",
+      "whyItMatters": "Why this step is important for achieving the career goal",
+      "estimatedTime": "Estimated completion time"
     }
   ]
 }
 
 Requirements:
 - Include at least 2 ordered learning steps.
-- Personalize the steps using the provided information.
-- Keep every step relevant to the career goal.
-- Do not include Markdown or any text outside the JSON.
+- Give each step a clear and specific title.
+- Clearly describe what the learner should learn or accomplish.
+- Explain why each step matters for reaching the learner's career goal.
+- Provide a realistic estimated time for each step.
+- Base the time estimates on the learner's available weekly hours and target timeframe.
+- Include enough information for the learner to understand what is expected at each stage.
+- Personalize every step using all provided learner information.
+- Do not include Markdown or text outside the JSON.
 `.trim();
 }
-
-
-
-export type LearningPathResponse = z.infer<typeof learningPathResponseSchema>;
-
 
