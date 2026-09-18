@@ -3,6 +3,7 @@ import {z} from "zod";
 
 // User profile Schema 
 export const learningPathRequestSchemas = z.object({
+
     targetRole: z.string().trim().min(1, "Target role is required"),
     currentLevel: z.string().trim().min(1),
     background: z.string().trim().min(1, "Background is required"),
