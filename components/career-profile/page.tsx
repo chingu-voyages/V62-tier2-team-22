@@ -5,8 +5,7 @@ import StepGoal from "@/components/career-profile/StepGoal";
 import StepLevel from "@/components/career-profile/StepLevel";
 import StepBackground from "@/components/career-profile/StepBackground";
 import StepCommitment from "@/components/career-profile/StepCommitment";
-import { saveCareerProfile } from "@/lib/actions/profile";
-import { CareerProfileInput } from "@/lib/validations/profile";
+import { learningPathRequest, learningPathRequestSchemas } from "../../schemas/formSchemas";
 import { Check, Compass, Layers, BookOpen, Target } from "lucide-react";
 
 type FieldValue = string | string[] | number | undefined;
@@ -20,26 +19,76 @@ const STEPS = [
 
 export default function CareerProfilePage() {
   const [step, setStep] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState<CareerProfileInput>({
-    targetRole: "", currentLevel: "", background: "", skills: [],
-    relevantExperience: "", whyGoalMatters: "", availableTime: "8", desiredTimeframe: "", learningPreference: "",
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [formData, setFormData] = useState<learningPathRequest>({
+    targetRole: "",
+    currentLevel: "beginner",
+    background: "",
+    skills: ["React", "JavaScript"],
+    relevantExperience: "",
+    whyGoalMatters: "",
+    availableTime: 8,
+    desiredTimeframe: "2 months",
+    learningPreference: "Project-based",
   });
 
-  const updateField = (field: keyof CareerProfileInput, value: FieldValue) => setFormData((prev) => ({ ...prev, [field]: value }));
-
-  const isStepValid = () => {
-    if (step === 1) return formData.targetRole?.trim() !== "" && formData.currentLevel !== "";
-    if (step === 2) return formData.background?.trim() !== "" && (formData.skills?.length ?? 0) > 0;
-    if (step === 3) return formData.relevantExperience?.trim() !== "";
-    return formData.availableTime !== "" && formData.desiredTimeframe !== "" && formData.learningPreference !== "";
+  const updateField = (field: keyof learningPathRequest, value: FieldValue) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: "" }));
+    }
   };
 
-  const handleSubmit = async () => {
-    setLoading(true);
-    try { await saveCareerProfile(formData); }
-    catch (err) { alert(err instanceof Error ? err.message : "An unexpected error occurred"); }
-    finally { setLoading(false); }
+  const validateCurrentStep = () => {
+    let schemaToValidate;
+
+    if (step === 1) {
+      schemaToValidate = learningPathRequestSchemas.pick({
+        targetRole: true,
+        currentLevel: true,
+      });
+    } else if (step === 2) {
+      schemaToValidate = learningPathRequestSchemas.pick({
+        background: true,
+        skills: true,
+      });
+    } else if (step === 3) {
+      schemaToValidate = learningPathRequestSchemas.pick({
+        relevantExperience: true,
+      });
+    } else if (step === 4) {
+      schemaToValidate = learningPathRequestSchemas.pick({
+        availableTime: true,
+        desiredTimeframe: true,
+        learningPreference: true,
+      });
+    }
+
+    if (!schemaToValidate) return true;
+
+    const result = schemaToValidate.safeParse(formData);
+
+    if (!result.success) {
+      const newErrors: { [key: string]: string } = {};
+      result.error.issues.forEach((issue) => {
+        if (issue.path[0]) {
+          newErrors[issue.path[0] as string] = "This field is required";
+        }
+      });
+      setErrors(newErrors);
+      return false;
+    }
+
+    setErrors({});
+    return true;
+  };
+
+  const handleNext = () => {
+    if (!validateCurrentStep()) return;
+
+    if (step < 4) {
+      setStep((s) => s + 1);
+    }
   };
 
   const curr = STEPS[step - 1];
@@ -74,12 +123,22 @@ export default function CareerProfilePage() {
           <span className="text-xs font-bold tracking-wider text-slate-400 uppercase">STEP {step} OF 4</span>
           <h2 className="text-xl font-bold text-slate-900 mt-2 mb-6">{curr.heading}</h2>
 
-          <StepComp formData={formData} onChange={updateField} />
+          <StepComp formData={formData} onChange={updateField} errors={errors} />
 
           <div className="flex items-center justify-between mt-10 pt-6 border-t border-slate-100">
-            {step > 1 ? <button type="button" onClick={() => setStep((s) => s - 1)} className="text-slate-600 hover:text-slate-900 text-sm font-medium transition px-2 py-1 cursor-pointer">Back</button> : <div />}
-            <button type="button" onClick={step < 4 ? () => setStep((s) => s + 1) : handleSubmit} disabled={loading || !isStepValid()} className="bg-[#0F172A] hover:bg-slate-800 text-white font-medium px-6 py-2.5 rounded-lg text-sm flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer">
-              {step < 4 ? "Continue →" : loading ? "Analyzing..." : "Analyze my profile"}
+            {step > 1 ? (
+              <button type="button" onClick={() => setStep((s) => s - 1)} className="text-slate-600 hover:text-slate-900 text-sm font-medium transition px-2 py-1 cursor-pointer">
+                Back
+              </button>
+            ) : (
+              <div />
+            )}
+            <button
+              type="button"
+              onClick={handleNext}
+              className="bg-[#0F172A] hover:bg-slate-800 text-white font-medium px-6 py-2.5 rounded-lg text-sm flex items-center gap-2 transition cursor-pointer"
+            >
+              {step < 4 ? "Continue →" : "Analyze my profile"}
             </button>
           </div>
         </div>

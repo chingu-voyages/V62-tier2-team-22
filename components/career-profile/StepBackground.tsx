@@ -1,13 +1,13 @@
 "use client";
 
-import { CareerProfileInput } from "@/lib/validations/profile";
 import { Check } from "lucide-react";
-
+import { learningPathRequest } from "../../schemas/formSchemas"; 
 type FieldValue = string | string[] | number | undefined;
 
 interface StepBackgroundProps {
-  formData: CareerProfileInput;
-  onChange: (field: keyof CareerProfileInput, value: FieldValue) => void;
+  formData: learningPathRequest;
+  onChange: (field: keyof learningPathRequest, value: FieldValue) => void;
+  errors?: { [key: string]: string };
 }
 
 const AVAILABLE_SKILLS = [
@@ -15,7 +15,9 @@ const AVAILABLE_SKILLS = [
   "Git", "Cloud", "UX Research", "Data Analysis", "APIs"
 ];
 
-export default function StepBackground({ formData, onChange }: StepBackgroundProps) {
+export default function StepBackground({ formData, onChange, errors }: StepBackgroundProps) {
+  const hasBgError = !!errors?.background;
+
   const toggleSkill = (skill: string) => {
     const currentSkills = formData.skills || [];
     if (currentSkills.includes(skill)) {
@@ -38,8 +40,17 @@ export default function StepBackground({ formData, onChange }: StepBackgroundPro
           value={formData.background || ""}
           onChange={(e) => onChange("background", e.target.value)}
           placeholder="e.g. Computer Science Student, Website developer"
-          className="w-full bg-white border border-slate-200 rounded-lg px-4 py-3 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition text-sm resize-none"
+          className={`w-full bg-white border rounded-lg px-4 py-3 text-slate-800 placeholder-slate-400 focus:outline-none transition text-sm resize-none ${
+            hasBgError
+              ? "border-rose-500 focus:border-rose-500 focus:ring-1 focus:ring-rose-500"
+              : "border-slate-200 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+          }`}
         />
+        {hasBgError && (
+          <p className="text-xs font-medium text-rose-500 mt-1.5">
+            * Background is required.
+          </p>
+        )}
       </div>
 
       {/* Skills Pill Selector */}

@@ -1,13 +1,12 @@
 "use client";
 
-import { CareerProfileInput } from "@/lib/validations/profile";
 import { Check } from "lucide-react";
-
+import { learningPathRequest } from "../../schemas/formSchemas"; 
 type FieldValue = string | string[] | number | undefined;
 
 interface StepCommitmentProps {
-  formData: CareerProfileInput;
-  onChange: (field: keyof CareerProfileInput, value: FieldValue) => void;
+  formData: learningPathRequest;
+  onChange: (field: keyof learningPathRequest, value: FieldValue) => void;
 }
 
 const timeframes = ["2 months", "4 months", "6 months", "Flexible"];
@@ -20,41 +19,37 @@ const preferences = [
 ];
 
 export default function StepCommitment({ formData, onChange }: StepCommitmentProps) {
-  return (
-    <div className="space-y-6">
-      {/* Hours Slider */}
-{(() => {
   const min = 2;
   const max = 20;
   const val = Number(formData.availableTime) || 8;
   const percentage = ((val - min) / (max - min)) * 100;
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-2">
-        <label className="block text-sm font-medium text-slate-800">
-          Available time · <span className="text-slate-900 font-bold">{formData.availableTime || 8} hours/week</span> <span className="text-cyan-600">*</span>
-        </label>
+    <div className="space-y-6">
+      {/* Hours Slider */}
+      <div>
+        <div className="flex justify-between items-center mb-2">
+          <label className="block text-sm font-medium text-slate-800">
+            Available time · <span className="text-slate-900 font-bold">{formData.availableTime || 8} hours/week</span> <span className="text-cyan-600">*</span>
+          </label>
+        </div>
+        <input
+          type="range"
+          min={min}
+          max={max}
+          step="1"
+          value={formData.availableTime || 8}
+          onChange={(e) => onChange("availableTime", Number(e.target.value))}
+          style={{
+            background: `linear-gradient(to right, #06b6d4 ${percentage}%, #e2e8f0 ${percentage}%)`
+          }}
+          className="w-full h-1.5 rounded-lg appearance-none cursor-pointer accent-cyan-500"
+        />
+        <div className="flex justify-between text-xs text-slate-400 mt-1">
+          <span>2h</span>
+          <span>20h</span>
+        </div>
       </div>
-      <input
-        type="range"
-        min={min}
-        max={max}
-        step="1"
-        value={formData.availableTime || "8"}
-        onChange={(e) => onChange("availableTime", e.target.value)}
-        style={{
-          background: `linear-gradient(to right, #06b6d4 ${percentage}%, #e2e8f0 ${percentage}%)`
-        }}
-        className="w-full h-1.5 rounded-lg appearance-none cursor-pointer accent-cyan-500"
-      />
-      <div className="flex justify-between text-xs text-slate-400 mt-1">
-        <span>2h</span>
-        <span>20h</span>
-      </div>
-    </div>
-  );
-})()}
 
       {/* Desired Timeframe */}
       <div>

@@ -12,16 +12,3 @@ datasource db {
   provider = "postgresql"
 }
 
-model CareerProfile {
-  id                 String   @id @default(cuid())
-  targetRole         String
-  currentLevel       String
-  background         String?
-  skills             String[]
-  relevantExperience String?
-  whyGoalMatters     String?
-  availableTime      String
-  desiredTimeframe   String
-  learningPreference String?
-  createdAt          DateTime @default(now())
-}
