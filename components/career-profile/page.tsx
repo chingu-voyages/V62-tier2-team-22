@@ -7,7 +7,7 @@ import StepBackground from "@/components/career-profile/StepBackground";
 import StepCommitment from "@/components/career-profile/StepCommitment";
 import { learningPathRequest, learningPathRequestSchemas } from "../../schemas/formSchemas";
 import { Check, Compass, Layers, BookOpen, Target } from "lucide-react";
-
+import type { LearningPathResponse } from "@/schemas/learningPathSchemas";
 type FieldValue = string | string[] | number | undefined;
 
 const STEPS = [
@@ -20,6 +20,9 @@ const STEPS = [
 export default function CareerProfilePage() {
   const [step, setStep] = useState(1);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generationError, setGenerationError] = useState("");
+  const [learningPath, setLearningPath] = useState<LearningPathResponse | null>(null);
   const [formData, setFormData] = useState<learningPathRequest>({
     targetRole: "",
     currentLevel: "beginner",
@@ -34,6 +37,8 @@ export default function CareerProfilePage() {
 
   const updateField = (field: keyof learningPathRequest, value: FieldValue) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    setLearningPath(null);
+    setGenerationError("");
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: "" }));
     }
@@ -82,13 +87,48 @@ export default function CareerProfilePage() {
     setErrors({});
     return true;
   };
+  const handleGeneratePath = async () => {
+    if (isGenerating) return;
+    setIsGenerating(true);
+    setGenerationError("");
+    setLearningPath(null);
+
+    try {
+      const res = await fetch("/api/learning-path", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      })
+      const result: {
+        data?: LearningPathResponse;
+        error?: string;
+      } = await res.json();
+
+      if (!res.ok || !result.data) {
+        throw new Error(result.error);
+      }
+      setLearningPath(result.data);
+    } catch {
+      setGenerationError("An error occurred while generating the learning path.");
+
+    } finally {
+      setIsGenerating(false);
+    }
+
+  }
+
+
 
   const handleNext = () => {
     if (!validateCurrentStep()) return;
 
     if (step < 4) {
       setStep((s) => s + 1);
+      return;
     }
+    void handleGeneratePath();
   };
 
   const curr = STEPS[step - 1];
@@ -123,22 +163,67 @@ export default function CareerProfilePage() {
           <span className="text-xs font-bold tracking-wider text-slate-400 uppercase">STEP {step} OF 4</span>
           <h2 className="text-xl font-bold text-slate-900 mt-2 mb-6">{curr.heading}</h2>
 
-          <StepComp formData={formData} onChange={updateField} errors={errors} />
+          {isGenerating ? (
+            <div
+              role="status"
+              aria-live="polite"
+              className="flex flex-col items-center justify-center gap-4 py-12 text-center"
+            >
+              <div
+                aria-hidden="true"
+                className="h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-cyan-500"
+              />
 
+              <div>
+                <h2 className="text-lg font-semibold text-slate-900">
+                  Generating your learning path...
+                </h2>
+
+                <p className="mt-1 text-sm text-slate-500">
+                  This may take a few moments.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <StepComp formData={formData} onChange={updateField} errors={errors} />
+          )}
+          {generationError && !isGenerating && (
+            <p role="alert" className="mt-4 text-sm text-red-600">
+              {generationError}
+            </p>
+          )}
+
+          {learningPath && !isGenerating && (
+            <p role="status" className="mt-4 text-sm text-emerald-600">
+              Your learning path has been generated successfully.
+            </p>
+          )}
           <div className="flex items-center justify-between mt-10 pt-6 border-t border-slate-100">
             {step > 1 ? (
-              <button type="button" onClick={() => setStep((s) => s - 1)} className="text-slate-600 hover:text-slate-900 text-sm font-medium transition px-2 py-1 cursor-pointer">
+              <button
+                type="button"
+                onClick={() => setStep((s) => s - 1)}
+                disabled={isGenerating}
+                className="text-slate-600 hover:text-slate-900 text-sm font-medium transition px-2 py-1 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
+              >
                 Back
               </button>
             ) : (
               <div />
             )}
+
             <button
               type="button"
               onClick={handleNext}
-              className="bg-[#0F172A] hover:bg-slate-800 text-white font-medium px-6 py-2.5 rounded-lg text-sm flex items-center gap-2 transition cursor-pointer"
+              disabled={isGenerating}
+              aria-busy={isGenerating}
+              className="bg-[#0F172A] hover:bg-slate-800 text-white font-medium px-6 py-2.5 rounded-lg text-sm flex items-center gap-2 transition cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {step < 4 ? "Continue →" : "Analyze my profile"}
+              {step < 4
+                ? "Continue →"
+                : isGenerating
+                  ? "Generating..."
+                  : "Analyze my profile"}
             </button>
           </div>
         </div>
