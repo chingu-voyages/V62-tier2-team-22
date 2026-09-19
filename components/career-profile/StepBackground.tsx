@@ -17,6 +17,7 @@ const AVAILABLE_SKILLS = [
 
 export default function StepBackground({ formData, onChange, errors }: StepBackgroundProps) {
   const hasBgError = !!errors?.background;
+  const hasSkillsError = !!errors?.skills;
 
   const toggleSkill = (skill: string) => {
     const currentSkills = formData.skills || [];
@@ -48,7 +49,7 @@ export default function StepBackground({ formData, onChange, errors }: StepBackg
         />
         {hasBgError && (
           <p className="text-xs font-medium text-rose-500 mt-1.5">
-            * Background is required.
+            {"* Background is required."}
           </p>
         )}
       </div>
@@ -58,6 +59,7 @@ export default function StepBackground({ formData, onChange, errors }: StepBackg
         <label className="block text-sm font-medium text-slate-800 mb-2">
           Skills you can already use <span className="text-cyan-600">*</span>
         </label>
+        
         <div className="flex flex-wrap gap-2.5 mt-2">
           {AVAILABLE_SKILLS.map((skill) => {
             const isSelected = formData.skills?.includes(skill);
@@ -78,6 +80,12 @@ export default function StepBackground({ formData, onChange, errors }: StepBackg
             );
           })}
         </div>
+
+        {hasSkillsError && (
+          <p className="text-xs font-medium text-rose-500 mt-2">
+            {"* Please select at least 1 skill."}
+          </p>
+        )}
       </div>
     </div>
   );
