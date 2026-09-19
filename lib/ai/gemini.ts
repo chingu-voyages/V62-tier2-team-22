@@ -9,7 +9,7 @@ export default async function queryAi(query:string):Promise<string>{
 
 
 	const interaction = await ai.interactions.create({
-		model:"gemini-3.8-flash",
+		model:"gemini-3.1-flash-lite",
 		input:query
 	})
 	if (interaction.output_text==undefined){

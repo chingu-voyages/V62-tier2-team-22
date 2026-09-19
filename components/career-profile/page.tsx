@@ -24,7 +24,7 @@ export default function CareerProfilePage() {
     targetRole: "",
     currentLevel: "beginner",
     background: "",
-    skills: ["React", "JavaScript"],
+    skills: [],
     relevantExperience: "",
     whyGoalMatters: "",
     availableTime: 8,
