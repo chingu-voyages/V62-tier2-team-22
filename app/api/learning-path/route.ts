@@ -1,7 +1,7 @@
 import {NextResponse} from "next/server";
 import {learningPathRequestSchemas} from "@/schemas/formSchemas";
-import queryAi from "@/lib/gemini";
-import { buildLearningPathPrompt} from "@/lib/learning-path";
+import queryAi from "@/lib/ai/gemini";
+import { buildLearningPathPrompt} from "@/lib/ai/learning-path";
 import {learningPathResponseSchema} from "@/schemas/learningPathSchemas";
 
 

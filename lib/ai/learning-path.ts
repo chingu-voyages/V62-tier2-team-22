@@ -1,4 +1,4 @@
-import type { learningPathRequest } from "../schemas/formSchemas";
+import type { learningPathRequest } from "../../schemas/formSchemas";
 
 export function buildLearningPathPrompt(
   data: learningPathRequest
