@@ -152,11 +152,6 @@ export default function StepBackground({ formData, onChange, errors }: StepBackg
 						})}
 					</div>
 				)}
-        {hasBgError && (
-					<p className="text-xs font-medium text-rose-500 mt-1.5">
-						* Please select at least 1 skill.
-					</p>
-				)}
 			</div>
 		</div>
 	);
