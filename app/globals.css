@@ -18,6 +18,8 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --font-sans: var(--font-space-grotesk), "Space Grotesk", sans-serif;
+  --default-font-family: var(--font-space-grotesk), "Space Grotesk", sans-serif;
 }
 
 @theme inline {
@@ -37,5 +39,5 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
 }

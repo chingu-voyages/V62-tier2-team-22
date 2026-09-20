@@ -18,6 +18,7 @@ interface StepBackgroundProps {
 
 export default function StepBackground({ formData, onChange, errors }: StepBackgroundProps) {
 	const hasBgError = !!errors?.background;
+  const hasSkillsError = !!errors?.skills;
 	const [availableSkills, setAvailableSkills] = useState<string[]>([])
 	const [isLoading, setIsLoading] = useState(false)
 
@@ -91,38 +92,6 @@ export default function StepBackground({ formData, onChange, errors }: StepBackg
 					</p>
 				)}
 			</div>
-
-			{/* Skills Pill Selector */}
-			{/* <div>
-        <label className="block text-sm font-medium text-slate-800 mb-2">
-          Skills you can already use <span className="text-cyan-600">*</span>
-        </label>
-		{ isLoading ? (
-			<Skeletons/>	
-		):
-          {availableSkills.map((skill,index) => {
-            const isSelected = formData.skills?.includes(skill);
-            return (
-        		<div className="flex flex-wrap gap-2.5 mt-2">
-					<button
-						key={skill}
-						type="button"
-						onClick={() => toggleSkill(skill)}
-						style={{ animationDelay: `${index * 60}ms` }}
-						className={`animate-pop-in px-4 py-2 rounded-full text-xs font-medium border flex items-center gap-1.5 transition ${isSelected
-								? "bg-cyan-50 border-cyan-400 text-slate-900"
-								: "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
-							}`}
-					>
-						{isSelected && <Check className="w-3.5 h-3.5 text-cyan-600" />}
-						{skill}
-					</button>
-				</div>
-            )
-          })}
-		}
-        </div>
-      </div> */}
 			<div>
 				<label className="block text-sm font-medium text-slate-800 mb-2">
 					Skills you can already use <span className="text-cyan-600">*</span>
@@ -151,6 +120,10 @@ export default function StepBackground({ formData, onChange, errors }: StepBackg
 							);
 						})}
 					</div>
+				)}  {hasSkillsError && (
+					<p className="text-xs font-medium text-rose-500 mt-1.5">
+						* Please select at least 1 skill.
+					</p>
 				)}
 			</div>
 		</div>
