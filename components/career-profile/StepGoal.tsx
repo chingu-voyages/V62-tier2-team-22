@@ -14,7 +14,8 @@ const levels = [
   { id: "beginner", label: "Beginner" },
   { id: "early_career", label: "Early career" },
   { id: "mid_level", label: "Mid-level" },
-  { id: "senior_switching", label: "Senior / switching" },
+  { id: "senior", label: "Senior" },
+  { id: "switching", label: "Switching" },
 ];
 
 export default function StepGoal({ formData, onChange, errors }: StepGoalProps) {
