@@ -1,7 +1,7 @@
 import Link from "next/link";
-import Navbar from "../components/career-profile/Navbar";
-import Footer from "../components/career-profile/Footer";
-import GridBackground from "../components/career-profile/InteractiveGrid";
+import Navbar from "@/components/career-profile/Navbar";
+import Footer from "@/components/career-profile/Footer";
+import GridBackground from "@/components/career-profile/InteractiveGrid";
 export default function Home() {
   return (
    <div className="font-sans bg-[#040914] text-white min-h-screen bg-grid-pattern relative flex flex-col justify-between overflow-hidden">
