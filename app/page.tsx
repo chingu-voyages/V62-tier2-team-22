@@ -4,7 +4,7 @@ import Footer from "@/components/career-profile/Footer";
 import GridBackground from "@/components/career-profile/InteractiveGrid";
 export default function Home() {
   return (
-   <div className="font-sans bg-[#040914] text-white min-h-screen bg-grid-pattern relative flex flex-col justify-between overflow-hidden">
+   <div className="bg-[#040914] text-white min-h-screen bg-grid-pattern relative flex flex-col justify-between overflow-hidden">
       {/* Background Glow Effect */}
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-cyan-500/10 blur-[120px] rounded-full pointer-events-none" />
 

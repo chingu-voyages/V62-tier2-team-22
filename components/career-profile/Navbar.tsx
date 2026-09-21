@@ -34,7 +34,7 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
           </Link>
         </div>
 
-        <div className="flex items-center space-x-4 rtl:space-x-reverse">
+        <div className="flex items-center space-x-4 rtl:space-x-reverse text-sm font-medium text-gray-700">
            <AuthStatus />
           <Link
             href="/career"
