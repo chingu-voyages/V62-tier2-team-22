@@ -5,9 +5,11 @@ import StepGoal from "@/components/career-profile/StepGoal";
 import StepLevel from "@/components/career-profile/StepLevel";
 import StepBackground from "@/components/career-profile/StepBackground";
 import StepCommitment from "@/components/career-profile/StepCommitment";
+import AnalysisEngine from "@/components/career-profile/AnalysisEngine";
 import { learningPathRequest, learningPathRequestSchemas } from "../../schemas/formSchemas";
 import { Check, Compass, Layers, BookOpen, Target } from "lucide-react";
 import type { LearningPathResponse } from "@/schemas/learningPathSchemas";
+
 type FieldValue = string | string[] | number | undefined;
 
 const STEPS = [
@@ -23,6 +25,10 @@ export default function CareerProfilePage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationError, setGenerationError] = useState("");
   const [learningPath, setLearningPath] = useState<LearningPathResponse | null>(null);
+
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisStep, setAnalysisStep] = useState(1);
+
   const [formData, setFormData] = useState<learningPathRequest>({
     targetRole: "",
     currentLevel: "beginner",
@@ -87,39 +93,51 @@ export default function CareerProfilePage() {
     setErrors({});
     return true;
   };
+
   const handleGeneratePath = async () => {
     if (isGenerating) return;
     setIsGenerating(true);
+    setIsAnalyzing(true);
+    setAnalysisStep(1);
     setGenerationError("");
     setLearningPath(null);
 
-    try {
-      const res = await fetch("/api/learning-path", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      })
-      const result: {
-        data?: LearningPathResponse;
-        error?: string;
-      } = await res.json();
-
+    const apiPromise = fetch("/api/learning-path", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    }).then(async (res) => {
+      const result: { data?: LearningPathResponse; error?: string } = await res.json();
       if (!res.ok || !result.data) {
-        throw new Error(result.error);
+        throw new Error(result.error || "Failed to generate learning path");
       }
-      setLearningPath(result.data);
-    } catch {
+      return result.data;
+    });
+
+    const stepInterval = setInterval(() => {
+      setAnalysisStep((prev) => {
+        if (prev < 5) return prev + 1;
+        return prev;
+      });
+    }, 1200); 
+
+    try {
+      const data = await apiPromise;
+
+      setAnalysisStep(5);
+      await new Promise((resolve) => setTimeout(resolve, 800));
+
+      setLearningPath(data);
+    } catch (err) {
       setGenerationError("An error occurred while generating the learning path.");
-
     } finally {
+      clearInterval(stepInterval);
       setIsGenerating(false);
+      setIsAnalyzing(false);
     }
-
-  }
-
-
+  };
 
   const handleNext = () => {
     if (!validateCurrentStep()) return;
@@ -130,6 +148,15 @@ export default function CareerProfilePage() {
     }
     void handleGeneratePath();
   };
+
+  if (isAnalyzing) {
+    return (
+      <AnalysisEngine
+        targetRole={formData.targetRole || "Target Role"}
+        analysisStep={analysisStep}
+      />
+    );
+  }
 
   const curr = STEPS[step - 1];
   const StepComp = curr.comp;
