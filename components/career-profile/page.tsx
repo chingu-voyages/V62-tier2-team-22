@@ -151,7 +151,7 @@ export default function CareerProfilePage() {
                 <span className={`text-xs ${step === s.id ? "text-cyan-600 font-bold" : "text-slate-400"}`}>{s.num}</span>
                 <span>{s.title}</span>
               </div>
-              {step > s.id && <Check className="w-4 h-4 text-emerald-500 stroke-[3]" />}
+              {step > s.id && <Check className="w-4 h-4 text-emerald-500 stroke-3" />}
             </div>
           ))}
         </div>
