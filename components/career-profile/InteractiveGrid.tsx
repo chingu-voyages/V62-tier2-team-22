@@ -21,15 +21,21 @@ export const InteractiveGrid: React.FC<{ children?: React.ReactNode }> = ({ chil
     let mousePos: Point = { x: -1000, y: -1000 };
 
     const resizeCanvas = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+	  if (!canvas.parentElement) return
+      canvas.width = canvas.parentElement.clientWidth
+      canvas.height = canvas.parentElement.clientHeight
     };
 
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
 
     const handleMouseMove = (e: MouseEvent) => {
-      mousePos = { x: e.clientX, y: e.clientY };
+	  if(!canvasRef.current) return
+	  const rect= canvasRef.current.getBoundingClientRect()
+	  mousePos={
+		x:e.clientX-rect.left,
+		y:e.clientY-rect.top
+	  }
     };
 
     window.addEventListener("mousemove", handleMouseMove);
@@ -39,8 +45,8 @@ export const InteractiveGrid: React.FC<{ children?: React.ReactNode }> = ({ chil
     const draw = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      ctx.fillStyle = "#070c18";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    //   ctx.fillStyle = "#070c18";
+    //   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       ctx.lineWidth = 1;
 
@@ -76,7 +82,7 @@ export const InteractiveGrid: React.FC<{ children?: React.ReactNode }> = ({ chil
     <div className="relative min-h-screen w-full bg-[#070c18] text-white">
       <canvas
         ref={canvasRef}
-        className="fixed top-0 left-0 w-full h-full pointer-events-none z-0"
+        className="absolute top-0 left-0 w-full h-full pointer-events-none z-0"
       />
       <div className="relative z-10">{children}</div>
     </div>
