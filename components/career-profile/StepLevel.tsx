@@ -23,7 +23,7 @@ export default function StepLevel({ formData, onChange, errors }: StepLevelProps
           rows={3}
           value={formData.relevantExperience || ""}
           onChange={(e) => onChange("relevantExperience", e.target.value)}
-          placeholder="e.g. React dashboard, REST API integration"
+          placeholder="Mention 1-2 real projects, apps shipped, or production systems you've worked on."
           className={`w-full bg-white rounded-lg px-4 py-3 text-slate-800 placeholder-slate-400 focus:outline-none transition text-sm resize-none border ${
             hasExpError
               ? "border-rose-500 focus:border-rose-500 focus:ring-1 focus:ring-rose-500"

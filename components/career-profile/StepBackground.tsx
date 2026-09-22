@@ -75,12 +75,12 @@ export default function StepBackground({ formData, onChange, errors }: StepBackg
 				<label className="block text-sm font-medium text-slate-800 mb-1">
 					Background <span className="text-cyan-600">*</span>
 				</label>
-				<p className="text-xs text-slate-400 mb-2">Education, work, or projects that shaped your starting point</p>
+				<p className="text-xs text-slate-400 mb-2">Summarize your education, degree, or non-traditional path into tech.</p>
 				<textarea
 					rows={3}
 					value={formData.background || ""}
 					onChange={(e) => onChange("background", e.target.value)}
-					placeholder="e.g. Computer Science Student, Website developer"
+					placeholder="e.g. Self-taught web developer with 2 years building client websites."
 					className={`w-full bg-white border rounded-lg px-4 py-3 text-slate-800 placeholder-slate-400 focus:outline-none transition text-sm resize-none ${hasBgError
 							? "border-rose-500 focus:border-rose-500 focus:ring-1 focus:ring-rose-500"
 							: "border-slate-200 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
@@ -94,8 +94,11 @@ export default function StepBackground({ formData, onChange, errors }: StepBackg
 			</div>
 			<div>
 				<label className="block text-sm font-medium text-slate-800 mb-2">
-					Skills you can already use <span className="text-cyan-600">*</span>
+				Skills you can already use <span className="text-cyan-600">*</span>
 				</label>
+				<p className="text-xs text-slate-400 mb-2">
+					Select the skills you're confident in using today
+				</p>
 
 				{isLoading ? (
 					<Skeletons />
