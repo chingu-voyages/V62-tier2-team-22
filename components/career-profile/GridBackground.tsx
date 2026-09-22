@@ -46,7 +46,7 @@ export const InteractiveGrid: React.FC<{ children?: React.ReactNode }> = ({ chil
     <div className="relative min-h-screen w-full bg-[#070c18] text-white">
       <canvas
         ref={canvasRef}
-        className="fixed top-0 left-0 w-full h-full pointer-events-none z-0"
+        className="absolute top-0 left-0 w-full h-full pointer-events-none z-0"
       />
       <div className="relative z-10">{children}</div>
     </div>

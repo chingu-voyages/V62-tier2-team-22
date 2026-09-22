@@ -4,6 +4,8 @@ import "./globals.css";
 import { Providers } from "@/components/Authentication/Providers";
 
 import { Space_Grotesk } from "next/font/google";
+import Navbar from "@/components/career-profile/Navbar";
+import Footer from "@/components/career-profile/Footer";
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
@@ -33,7 +35,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased  ${spaceGrotesk.variable}`}
     >
       <body className="min-h-full flex flex-col">
-		<Providers>{children}</Providers>
+		<Providers>
+			<Navbar/>
+			<main className="flex-1">{children}</main>
+			<Footer/>
+		</Providers>
 	  </body>
     </html>
   );

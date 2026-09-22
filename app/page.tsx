@@ -8,8 +8,6 @@ export default function Home() {
       {/* Background Glow Effect */}
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-cyan-500/10 blur-[120px] rounded-full pointer-events-none" />
 
-      {/* Header / Navbar */}
-      <Navbar />
 <GridBackground> 
       {/* Main Content Layout - Grid View */}
       <main className="max-w-7xl mx-auto px-6 py-8 relative z-10 flex-1 w-full flex items-center">
@@ -109,12 +107,7 @@ export default function Home() {
 
         </div>
       </main>
-      {/* Footer */}
-      <Footer />
       </GridBackground>
-	  
-
-      
     </div>
 	
   );
