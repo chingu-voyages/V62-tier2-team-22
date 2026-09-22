@@ -102,6 +102,8 @@ export default function CareerProfilePage() {
     setGenerationError("");
     setLearningPath(null);
 
+	localStorage.setItem("careerFormState",JSON.stringify(formData))
+
     const apiPromise = fetch("/api/learning-path", {
       method: "POST",
       headers: {
