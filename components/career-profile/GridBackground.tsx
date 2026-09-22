@@ -2,11 +2,6 @@
 
 import React, { useEffect, useRef } from "react";
 
-interface Point {
-  x: number;
-  y: number;
-}
-
 export const InteractiveGrid: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -17,58 +12,33 @@ export const InteractiveGrid: React.FC<{ children?: React.ReactNode }> = ({ chil
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    let animationFrameId: number;
-    let mousePos: Point = { x: -1000, y: -1000 };
+    const gridSize = 50;
 
-    const resizeCanvas = () => {
+    const drawGrid = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
-    };
 
-    resizeCanvas();
-    window.addEventListener("resize", resizeCanvas);
-
-    const handleMouseMove = (e: MouseEvent) => {
-      mousePos = { x: e.clientX, y: e.clientY };
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-
-    const gridSize = 50; 
-
-    const draw = () => {
+      // 2. Clear canvas and set base fill/stroke
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-
       ctx.fillStyle = "#070c18";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      ctx.lineWidth = 1;
+      ctx.lineWidth = 0.05;
+      ctx.strokeStyle = "#eeeeee"; 
 
       for (let x = 0; x < canvas.width; x += gridSize) {
         for (let y = 0; y < canvas.height; y += gridSize) {
-          const dx = mousePos.x - x;
-          const dy = mousePos.y - y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-
-          if (dist < 150) {
-            ctx.strokeStyle = `rgba(56, 189, 248, ${1 - dist / 150})`;
-          } else {
-            ctx.strokeStyle = "rgba(30, 41, 59, 0.4)";
-          }
-
           ctx.strokeRect(x, y, gridSize, gridSize);
         }
       }
-
-      animationFrameId = requestAnimationFrame(draw);
     };
 
-    draw();
+    drawGrid();
+
+    window.addEventListener("resize", drawGrid);
 
     return () => {
-      window.removeEventListener("resize", resizeCanvas);
-      window.removeEventListener("mousemove", handleMouseMove);
-      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener("resize", drawGrid);
     };
   }, []);
 
