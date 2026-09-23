@@ -24,7 +24,7 @@ Create a personalized learning path based on this learner's information:
 Career goal: ${data.targetRole}
 Current skill level: ${data.currentLevel}
 Background: ${data.background}
-Existing skills: ${data.skills.join(", ")}
+Existing skills: ${data.skills}
 Available learning time: ${data.availableTime} hours per week
 Target timeframe: ${data.desiredTimeframe}
 ${optionalFields.filter(Boolean).join("\n")}
