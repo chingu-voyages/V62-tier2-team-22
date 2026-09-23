@@ -1,8 +1,6 @@
 "use client";
 
-import { Check } from "lucide-react";
 import { learningPathRequest } from "../../schemas/formSchemas";
-import { useEffect, useState } from "react";
 
 
 type FieldValue = string | string[] | number | undefined;
@@ -16,7 +14,6 @@ interface StepBackgroundProps {
 
 export default function StepBackground({ formData, onChange, errors }: StepBackgroundProps) {
 	const hasBgError = !!errors?.background;
-  	const hasSkillsError = !!errors?.skills;
 
 	return (
 		<div className="space-y-6">
@@ -58,16 +55,8 @@ export default function StepBackground({ formData, onChange, errors }: StepBackg
 					value={formData.skills || ""}
 					onChange={(e) => onChange("skills", e.target.value)}
 					placeholder="e.g. TypeScript, Prompt engineering, System design etc."
-					className={`w-full bg-white border rounded-lg px-4 py-3 text-slate-800 placeholder-slate-400 focus:outline-none transition text-sm resize-none ${hasBgError
-							? "border-rose-500 focus:border-rose-500 focus:ring-1 focus:ring-rose-500"
-							: "border-slate-200 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
-						}`}
+					className="w-full bg-white border rounded-lg px-4 py-3 text-slate-800 placeholder-slate-400 focus:outline-none transition text-sm resize-none border-slate-200 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
 				/>
-				{hasSkillsError && (
-					<p className="text-xs font-medium text-rose-500 mt-1.5">
-						* Please mention at least 1 skill
-					</p>
-				)}
 			</div>
 		</div>
 	);
