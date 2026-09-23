@@ -1,4 +1,5 @@
 import {z} from "zod";
+import { learningPathRequest } from "./formSchemas";
 
 export const learningStepsSchema = z.object({
     position: z.number().int().positive(),
@@ -17,3 +18,14 @@ export const learningPathResponseSchema = z.object({
 export type LearningStep = z.infer<typeof learningStepsSchema>;
 
 export type LearningPathResponse = z.infer<typeof learningPathResponseSchema>;
+
+export interface PathSteps extends LearningStep{
+	completed?:boolean
+}
+
+export interface PathInformation {
+	id:string,
+	createdAt:string,
+	formData:learningPathRequest,
+	steps:PathSteps[]
+}

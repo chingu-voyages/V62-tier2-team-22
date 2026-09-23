@@ -8,7 +8,8 @@ import StepCommitment from "@/components/career-profile/StepCommitment";
 import AnalysisEngine from "@/components/career-profile/AnalysisEngine";
 import { learningPathRequest, learningPathRequestSchemas } from "../../schemas/formSchemas";
 import { Check, Compass, Layers, BookOpen, Target } from "lucide-react";
-import type { LearningPathResponse } from "@/schemas/learningPathSchemas";
+import type { LearningPathResponse, PathInformation } from "@/schemas/learningPathSchemas";
+import { storePath } from "@/lib/storage";
 
 type FieldValue = string | string[] | number | undefined;
 
@@ -115,6 +116,16 @@ export default function CareerProfilePage() {
       if (!res.ok || !result.data) {
         throw new Error(result.error || "Failed to generate learning path");
       }
+
+	  const pathInfo:PathInformation={
+		id:crypto.randomUUID(),
+		createdAt:new Date().toISOString(),
+		formData,
+		steps:result.data.steps
+	  }
+
+	  await storePath(pathInfo)
+
       return result.data;
     });
 
