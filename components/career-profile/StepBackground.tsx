@@ -22,12 +22,12 @@ export default function StepBackground({ formData, onChange, errors }: StepBackg
 				<label className="block text-sm font-medium text-slate-800 mb-1">
 					Background <span className="text-cyan-600">*</span>
 				</label>
-				<p className="text-xs text-slate-400 mb-2">Summarize your education, degree, or non-traditional path into tech.</p>
+				<p className="text-xs text-slate-400 mb-2">Summarize your education, degree, or non-traditional path into tech</p>
 				<textarea
 					rows={3}
 					value={formData.background || ""}
 					onChange={(e) => onChange("background", e.target.value)}
-					placeholder="e.g. Self-taught web developer with 2 years building client websites."
+					placeholder="e.g. Self-taught web developer with 2 years building client websites..."
 					className={`w-full bg-white border rounded-lg px-4 py-3 text-slate-800 placeholder-slate-400 focus:outline-none transition text-sm resize-none ${hasBgError
 							? "border-rose-500 focus:border-rose-500 focus:ring-1 focus:ring-rose-500"
 							: "border-slate-200 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
@@ -54,7 +54,7 @@ export default function StepBackground({ formData, onChange, errors }: StepBackg
 					rows={2}
 					value={formData.skills || ""}
 					onChange={(e) => onChange("skills", e.target.value)}
-					placeholder="e.g. TypeScript, Prompt engineering, System design etc."
+					placeholder="e.g. TypeScript, Prompt engineering, System design, etc..."
 					className="w-full bg-white border rounded-lg px-4 py-3 text-slate-800 placeholder-slate-400 focus:outline-none transition text-sm resize-none border-slate-200 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
 				/>
 			</div>

@@ -16,14 +16,14 @@ export default function StepLevel({ formData, onChange, errors }: StepLevelProps
     <div className="space-y-6">
       <div>
         <label className="block text-sm font-medium text-slate-800 mb-1">
-          Relevant experience <span className="text-rose-500">*</span>
+          Relevant experience <span className="text-cyan-600">*</span>
         </label>
-        <p className="text-xs text-slate-400 mb-2">One or two examples are enough</p>
+        <p className="text-xs text-slate-400 mb-2">Mention 1-2 real projects, apps shipped, or production systems you've worked on</p>
         <textarea
           rows={3}
           value={formData.relevantExperience || ""}
           onChange={(e) => onChange("relevantExperience", e.target.value)}
-          placeholder="Mention 1-2 real projects, apps shipped, or production systems you've worked on."
+          placeholder="I shipped a React dashboard and collaborated with a backend team..."
           className={`w-full bg-white rounded-lg px-4 py-3 text-slate-800 placeholder-slate-400 focus:outline-none transition text-sm resize-none border ${
             hasExpError
               ? "border-rose-500 focus:border-rose-500 focus:ring-1 focus:ring-rose-500"

@@ -10,7 +10,7 @@ export default function Home() {
 
 <GridBackground> 
       {/* Main Content Layout - Grid View */}
-      <main className="max-w-7xl mx-auto px-6 py-8 relative z-10 flex-1 w-full flex items-center">
+      <main className="max-w-7xl mx-auto px-16 py-8 relative z-10 flex-1 w-full flex items-center">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center w-full">
           
           {/* Left Column: Hero Text & Action */}
