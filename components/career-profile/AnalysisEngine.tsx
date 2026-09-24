@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Check, FlaskConical } from "lucide-react";
-import { InteractiveGrid } from "../../components/career-profile/InteractiveGrid";
+import { InteractiveGrid } from "./GridBackground";
 
 interface AnalysisEngineProps {
   targetRole?: string;

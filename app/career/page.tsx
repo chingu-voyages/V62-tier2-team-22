@@ -3,8 +3,6 @@
 
 import { useRouter } from "next/navigation";
 import AnalysisEngine from "@/components/career-profile/AnalysisEngine";
-import Navbar from "@/components/career-profile/Navbar";
-import Footer from "@/components/career-profile/Footer";
 
 export default function CareerPage() {
   const router = useRouter();
@@ -15,11 +13,9 @@ export default function CareerPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Navbar />
-      <main className="flex-grow">
+      <main className="grow">
         <AnalysisEngine onComplete={handleAnalysisComplete} />
       </main>
-      <Footer />
     </div>
   );
 }
