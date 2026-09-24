@@ -6,7 +6,7 @@ import { InteractiveGrid } from "../../components/career-profile/InteractiveGrid
 
 interface AnalysisEngineProps {
   targetRole?: string;
-  analysisStep: number;
+  analysisStep?: number;
   onComplete?: () => void;
 }
 
