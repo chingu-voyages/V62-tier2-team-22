@@ -1,11 +1,13 @@
 "use client";
 
+import React, { useState, useEffect } from "react";
 import { Check, FlaskConical } from "lucide-react";
 import { InteractiveGrid } from "./GridBackground";
 
 interface AnalysisEngineProps {
   targetRole?: string;
   analysisStep?: number;
+  onComplete?: () => void;
 }
 
 const ANALYSIS_LABELS = [
@@ -18,8 +20,35 @@ const ANALYSIS_LABELS = [
 
 export default function AnalysisEngine({
   targetRole = "Front end",
-  analysisStep = 1,
+  onComplete,
 }: AnalysisEngineProps) {
+  const [analysisStep, setAnalysisStep] = useState(1);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setAnalysisStep((prev) => {
+        if (prev < ANALYSIS_LABELS.length) {
+          return prev + 1;
+        } else {
+          clearInterval(interval);
+          return prev;
+        }
+      });
+    }, 1200);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    if (analysisStep === ANALYSIS_LABELS.length && onComplete) {
+      const timeout = setTimeout(() => {
+        onComplete();
+      }, 1000);
+
+      return () => clearTimeout(timeout);
+    }
+  }, [analysisStep, onComplete]);
+
   return (
     <div className="relative min-h-screen bg-[#030712] text-slate-100 flex flex-col items-center justify-center p-4 font-sans overflow-hidden">
       <div
