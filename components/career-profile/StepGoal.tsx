@@ -26,14 +26,14 @@ export default function StepGoal({ formData, onChange, errors }: StepGoalProps) 
       {/* Target Role Input */}
       <div>
         <label className="block text-sm font-medium text-slate-800 mb-1">
-          Target role <span className="text-rose-500">*</span>
+          Target role <span className="text-cyan-600">*</span>
         </label>
-        <p className="text-xs text-slate-400 mb-2">Be specific enough to shape the skill model</p>
+        <p className="text-xs text-slate-400 mb-2">The specific job title you're aiming for</p>
         <input
           type="text"
           value={formData.targetRole || ""}
           onChange={(e) => onChange("targetRole", e.target.value)}
-          placeholder="e.g. Front end, AI Product Engineer"
+          placeholder="e.g. Front-end developer, AI Product Engineer"
           className={`w-full bg-white border rounded-lg px-4 py-3 text-slate-800 placeholder-slate-400 focus:outline-none transition text-sm ${
             hasTargetRoleError
               ? "border-rose-500 focus:border-rose-500 focus:ring-1 focus:ring-rose-500"
