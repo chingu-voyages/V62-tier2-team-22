@@ -33,6 +33,7 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --signal-strong: oklch(64% 0.17 219);
   }
 }
 
@@ -40,4 +41,7 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+}
+.text-signal-strong {
+  color: var(--signal-strong);
 }
