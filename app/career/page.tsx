@@ -1,28 +1,25 @@
+// E:\V62-tier2-team-22\app\career\page.tsx
 "use client";
 
-import { useState } from "react";
+import { useRouter } from "next/navigation";
 import AnalysisEngine from "@/components/career-profile/AnalysisEngine";
-import LearningPath from "../learning-path/page";
 import Navbar from "@/components/career-profile/Navbar";
 import Footer from "@/components/career-profile/Footer";
 
-export default function Home() {
-  const [isAnalyzed, setIsAnalyzed] = useState(false);
+export default function CareerPage() {
+  const router = useRouter();
+
+  const handleAnalysisComplete = () => {
+    router.push("/learning-path");
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
-      
       <main className="flex-grow">
-        {!isAnalyzed ? (
-          <AnalysisEngine onComplete={() => setIsAnalyzed(true)} />
-        ) : (
-          <LearningPath />
-          
-        )}
-        
+        <AnalysisEngine onComplete={handleAnalysisComplete} />
       </main>
-      <Footer/>
+      <Footer />
     </div>
   );
 }
