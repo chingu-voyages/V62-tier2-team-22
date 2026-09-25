@@ -19,7 +19,7 @@ export type LearningStep = z.infer<typeof learningStepsSchema>;
 
 export type LearningPathResponse = z.infer<typeof learningPathResponseSchema>;
 
-export interface PathSteps extends LearningStep{
+export interface PathStep extends LearningStep{
 	completed?:boolean
 }
 
@@ -27,5 +27,5 @@ export interface PathInformation {
 	id:string,
 	createdAt:string,
 	formData:learningPathRequest,
-	steps:PathSteps[]
+	steps:PathStep[]
 }
