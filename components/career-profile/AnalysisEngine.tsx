@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Check, FlaskConical } from "lucide-react";
-import { InteractiveGrid } from "./GridBackground";
+import { GridBackground } from "./GridBackground";
 
 interface AnalysisEngineProps {
   targetRole?: string;
@@ -61,7 +61,7 @@ export default function AnalysisEngine({
           backgroundSize: "40px 40px",
         }}
       />
-      <InteractiveGrid>
+      <GridBackground>
         <div className="relative z-10 w-full max-w-2xl text-center px-4 mx-auto">
           <div className="mx-auto w-16 h-16 rounded-full bg-emerald-950/40 border border-cyan-500/30 flex items-center justify-center mb-6 shadow-[0_0_25px_rgba(6,182,212,0.15)]">
             <FlaskConical className="w-7 h-7 text-cyan-400" />
@@ -134,7 +134,7 @@ export default function AnalysisEngine({
             Keep this tab open · typically under 10 seconds
           </p>
         </div>
-      </InteractiveGrid>
+      </GridBackground>
     </div>
   );
 }
