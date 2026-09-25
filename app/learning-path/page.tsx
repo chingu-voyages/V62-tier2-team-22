@@ -13,8 +13,6 @@ import {
 import Link from 'next/link';
 import { useRouter } from "next/navigation";
 import AnalysisEngine from "@/app/AnalysisEngine/page";
-import Navbar from "@/components/career-profile/Navbar";
-import Footer from "@/components/career-profile/Footer";
 interface Resource {
   title: string;
   type: string;
@@ -165,7 +163,6 @@ export default function LearningPath() {
     <div className="min-h-screen bg-[#fafbfc] text-slate-800 pb-1">
       {/* Top Header Bar */}
 
-      <Navbar/>
 
       {/* Hero Banner Header */}
       <div className="bg-[#0b1329] text-white px-6 py-10">
@@ -465,7 +462,7 @@ export default function LearningPath() {
           </div>
         </section>
       </main>
-      <Footer/>
+
     </div>
     
   );
