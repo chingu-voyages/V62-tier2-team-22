@@ -42,6 +42,10 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
 }
+
+@theme {
+	--color-path-background:#071523;
+}
 .text-signal-strong {
   color: var(--signal-strong);
 }

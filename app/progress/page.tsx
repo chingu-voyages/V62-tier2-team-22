@@ -1,36 +1,55 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { 
   ArrowLeft, 
   Clock, 
   ArrowRight 
 } from 'lucide-react';
 import Link from 'next/link';
-// Interfaces for component state & props
-interface Module {
-  id: number;
-  title: string;
-  status: 'Not started' | 'In progress' | 'Completed';
-  duration: string;
-}
+import { PathStep } from "@/schemas/learningPathSchemas";
+import {retrieveCurrentPath} from '@/lib/storage'
+import { PathInformation } from '@/schemas/learningPathSchemas';
+
 
 export default function CareerProgress() {
-  // State management
+  const [steps,setSteps] = useState<PathStep[]>([]);
+  const [currentPath,setCurrentPath] = useState<PathInformation>();
+  const [isLoading,setIsLoading] = useState(true)
   const [completionPercentage, setCompletionPercentage] = useState<number>(0);
   const [completedCount, setCompletedCount] = useState<number>(0);
-  const [currentModuleIndex, setCurrentModuleIndex] = useState<number>(1);
+  const [currentStepIndex, setCurrentStepIndex] = useState<number>(1);
 
-  const modules: Module[] = [
-    { id: 1, title: 'Systems thinking for modern products', status: 'Not started', duration: '8 hours' },
-    { id: 2, title: 'Applied TypeScript & API design', status: 'Not started', duration: '14 hours' },
-    { id: 3, title: 'Front end workflow laboratory', status: 'Not started', duration: '18 hours' },
-    { id: 4, title: 'Portfolio proof project', status: 'Not started', duration: '24 hours' },
-    { id: 5, title: 'Interview narratives & gap review', status: 'Not started', duration: '7 hours' },
-  ];
+  useEffect(() => {
+    // 1. Safe to access localStorage on the client inside useEffect
+    const path = retrieveCurrentPath();
+
+    if (path) {
+      setCurrentPath(path);
+	  setSteps(path.steps)
+    }
+    
+    setIsLoading(false);
+  }, []);
+
+  if (isLoading) {
+    return <div>Loading learning path...</div>;
+  }
+
+  if (!steps.length) {
+    return <div>No learning path found. Please generate one first.</div>;
+  }
+  const remainingTime= currentPath!.steps.reduce((sum,step)=>{
+	if (step.completed) return sum
+
+	return (sum+Number(step.estimatedTime.split(' ')[0]))
+  },0)
+  const unit=currentPath!.steps[0].estimatedTime.split(' ')[1]
+
+
 
   return (
-    <div className="min-h-screen bg-gray-50 text-slate-800  antialiased">
+    <div className="min-h-screen bg-gray-50 text-slate-800 antialiased">
       {/* Main Container */}
       <main className="max-w-7xl mx-auto px-6 py-6">
 
@@ -53,7 +72,7 @@ export default function CareerProgress() {
                 CAREER TRAJECTORY
               </span>
               <h1 className="text-2xl sm:text-3xl font-bold mb-8">
-                Progress toward Front end
+                Progress toward {currentPath!.formData.targetRole}
               </h1>
 
               {/* Stat Highlight */}
@@ -76,15 +95,15 @@ export default function CareerProgress() {
             {/* Bottom Details Grid */}
             <div className="grid grid-cols-3 gap-4 border-t border-slate-800/80 pt-6">
               <div>
-                <p className="text-2xl font-bold text-white">{completedCount}/{modules.length}</p>
-                <p className="text-xs text-gray-400 mt-1">modules complete</p>
+                <p className="text-2xl font-bold text-white">{completedCount}/{steps.length}</p>
+                <p className="text-xs text-gray-400 mt-1">Steps complete</p>
               </div>
               <div>
-                <p className="text-2xl font-bold text-white">71h</p>
+                <p className="text-2xl font-bold text-white">{remainingTime} {unit}</p>
                 <p className="text-xs text-gray-400 mt-1">estimated remaining</p>
               </div>
               <div>
-                <p className="text-2xl font-bold text-white">Module {currentModuleIndex}</p>
+                <p className="text-2xl font-bold text-white">Step {currentStepIndex}</p>
                 <p className="text-xs text-gray-400 mt-1">current focus</p>
               </div>
             </div>
@@ -97,10 +116,12 @@ export default function CareerProgress() {
                 NEXT MILESTONE
               </span>
               <h2 className="text-2xl font-bold text-slate-900 mb-3 leading-snug">
-                Systems thinking for modern products
+			    {
+					currentStepIndex<currentPath!.steps.length ? steps[currentStepIndex+1].title : steps[currentStepIndex].title
+				}
               </h2>
               <p className="text-sm text-gray-500 leading-relaxed mb-8">
-                Complete this module to move your capability model forward.
+                Complete this step to move your capability model forward.
               </p>
             </div>
 
@@ -108,9 +129,8 @@ export default function CareerProgress() {
               <div className="flex items-center justify-between text-sm text-gray-500 border-t border-gray-100 pt-4 mb-6">
                 <div className="flex items-center space-x-1.5">
                   <Clock className="w-4 h-4 text-signal-strong" />
-                  <span>8 hours</span>
+                  <span>{steps[currentStepIndex].estimatedTime}</span>
                 </div>
-                <span className="font-medium text-gray-600">Foundation</span>
               </div>
 
               <Link 
@@ -129,25 +149,25 @@ export default function CareerProgress() {
         <section>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold text-slate-900">Learning record</h2>
-            <span className="text-xs text-gray-400">Updates as you complete modules</span>
+            <span className="text-xs text-gray-400">Updates as you complete steps</span>
           </div>
 
           {/* Modules List Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {modules.map((mod) => (
+            {steps.map((step) => (
               <div 
-                key={mod.id} 
+                key={step.position} 
                 className="bg-white border border-gray-200 rounded-lg p-5 flex items-start space-x-4 hover:border-gray-300 transition-all shadow-sm"
               >
                 <div className="w-8 h-8 rounded-full bg-gray-100 text-gray-500 font-semibold text-sm flex items-center justify-center shrink-0">
-                  {mod.id}
+                  {step.position}
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="text-sm font-semibold text-slate-900 truncate">
-                    {mod.title}
+                    {step.title}
                   </h3>
                   <p className="text-xs text-gray-400 mt-1">
-                    {mod.status} · {mod.duration}
+                    {step.completed?"Completed":"Not completed"} · {step.estimatedTime}
                   </p>
                 </div>
               </div>

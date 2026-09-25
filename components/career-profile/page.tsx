@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import StepGoal from "@/components/career-profile/StepGoal";
 import StepLevel from "@/components/career-profile/StepLevel";
 import StepBackground from "@/components/career-profile/StepBackground";
@@ -8,7 +8,9 @@ import StepCommitment from "@/components/career-profile/StepCommitment";
 import AnalysisEngine from "@/components/career-profile/AnalysisEngine";
 import { learningPathRequest, learningPathRequestSchemas } from "../../schemas/formSchemas";
 import { Check, Compass, Layers, BookOpen, Target } from "lucide-react";
-import type { LearningPathResponse } from "@/schemas/learningPathSchemas";
+import type { LearningPathResponse, PathInformation } from "@/schemas/learningPathSchemas";
+import { storePath } from "@/lib/storage";
+import {useRouter} from 'next/navigation'
 
 type FieldValue = string | string[] | number | undefined;
 
@@ -20,6 +22,7 @@ const STEPS = [
 ];
 
 export default function CareerProfilePage() {
+  const router = useRouter();
   const [step, setStep] = useState(1);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isGenerating, setIsGenerating] = useState(false);
@@ -40,6 +43,12 @@ export default function CareerProfilePage() {
     desiredTimeframe: "2 months",
     learningPreference: "Project-based",
   });
+
+  useEffect(() => {
+  if (learningPath) {
+      router.replace("/learning-path");
+  }
+  }, [learningPath, router]);
 
   const updateField = (field: keyof learningPathRequest, value: FieldValue) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -102,6 +111,8 @@ export default function CareerProfilePage() {
     setGenerationError("");
     setLearningPath(null);
 
+	localStorage.setItem("careerFormState",JSON.stringify(formData))
+
     const apiPromise = fetch("/api/learning-path", {
       method: "POST",
       headers: {
@@ -113,6 +124,16 @@ export default function CareerProfilePage() {
       if (!res.ok || !result.data) {
         throw new Error(result.error || "Failed to generate learning path");
       }
+
+	  const pathInfo:PathInformation={
+		id:crypto.randomUUID(),
+		createdAt:new Date().toISOString(),
+		formData,
+		steps:result.data.steps
+	  }
+
+	  await storePath(pathInfo)
+
       return result.data;
     });
 
@@ -148,12 +169,17 @@ export default function CareerProfilePage() {
     }
     void handleGeneratePath();
   };
-
+	const handleAnalysisComplete = () => {
+		if (learningPath){
+			router.replace("/learning-path");
+		}
+	}
   if (isAnalyzing) {
     return (
       <AnalysisEngine
         targetRole={formData.targetRole || "Target Role"}
         analysisStep={analysisStep}
+		onComplete={handleAnalysisComplete}
       />
     );
   }

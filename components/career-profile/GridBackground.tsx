@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef } from "react";
 
-export const InteractiveGrid: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
+export const GridBackground: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
@@ -53,4 +53,4 @@ export const InteractiveGrid: React.FC<{ children?: React.ReactNode }> = ({ chil
   );
 };
 
-export default InteractiveGrid;
+export default GridBackground;

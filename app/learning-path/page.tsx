@@ -1,6 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import {retrieveCurrentPath} from '@/lib/storage'
+import React, { useState,useEffect } from "react";
+import { PathStep } from "@/schemas/learningPathSchemas";
+import { PathInformation } from '@/schemas/learningPathSchemas';
 import {
   ChevronDown,
   ChevronUp,
@@ -11,130 +14,64 @@ import {
   Clock,
 } from "lucide-react";
 import Link from 'next/link';
+
 interface Resource {
   title: string;
   type: string;
   url?: string;
 }
-interface Module {
-  id: string;
-  badge: string;
-  badgeColor: string;
-  hours: string;
-  level: string;
-  title: string;
-  whyItMatters: string;
-  dependsOn: string;
-  resources: Resource[];
-  completed: boolean;
-}
 
-const initialModules: Module[] = [
-  {
-    id: "01",
-    badge: "FOUNDATION",
-    badgeColor: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300",
-    hours: "8 hours",
-    level: "Foundation",
-    title: "Systems thinking for modern products",
-    whyItMatters:
-      "Build the technical reasoning expected of a Front end, while connecting concepts to your Website.",
-    dependsOn: "None",
-    resources: [
-      { title: "Systems Design Primer", type: "Guide" },
-      { title: "Architecture field guide", type: "Docs" },
-    ],
-    completed: true,
-  },
-  {
-    id: "02",
-    badge: "CORE CAPABILITY",
-    badgeColor: "bg-sky-100 text-sky-800 dark:bg-sky-950/60 dark:text-sky-300",
-    hours: "14 hours",
-    level: "Intermediate",
-    title: "Applied TypeScript & API design",
-    whyItMatters:
-      "Close a high-impact implementation gap and create a reliable base for production work.",
-    dependsOn: "Module 01",
-    resources: [
-      { title: "TypeScript Handbook", type: "Docs" },
-      { title: "API contract lab", type: "Project" },
-    ],
-    completed: false,
-  },
-  {
-    id: "03",
-    badge: "SPECIALIZATION",
-    badgeColor: "bg-purple-100 text-purple-800 dark:bg-purple-950/60 dark:text-purple-300",
-    hours: "18 hours",
-    level: "Intermediate",
-    title: "Front end workflow laboratory",
-    whyItMatters:
-      "Master modern build tools, CI/CD pipelines, and front-end performance profiling.",
-    dependsOn: "Module 02",
-    resources: [
-      { title: "Webpack & Vite Deep Dive", type: "Guide" },
-      { title: "CI/CD for Front-end Developers", type: "Course" },
-    ],
-    completed: false,
-  },
-  {
-    id: "04",
-    badge: "EVIDENCE",
-    badgeColor: "bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300",
-    hours: "24 hours",
-    level: "Advanced",
-    title: "Portfolio proof project",
-    whyItMatters:
-      "Synthesize all skills into a complex, production-grade application that showcases your capability.",
-    dependsOn: "Module 03",
-    resources: [
-      { title: "Project Specification", type: "Brief" },
-      { title: "Production Deployment Checklist", type: "Docs" },
-    ],
-    completed: false,
-  },
-  {
-    id: "05",
-    badge: "CAREER READINESS",
-    badgeColor: "bg-indigo-100 text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300",
-    hours: "7 hours",
-    level: "Focused",
-    title: "Interview narratives & gap review",
-    whyItMatters:
-      "Prepare to articulate technical trade-offs, architecture decisions, and career experience clearly.",
-    dependsOn: "Module 04",
-    resources: [
-      { title: "System Design Interview Prep", type: "Guide" },
-      { title: "Behavioral Storytelling", type: "Workshop" },
-    ],
-    completed: false,
-  },
-];
+
+
 
 export default function LearningPath() {
-  const [modules, setModules] = useState<Module[]>(initialModules);
-  const [expandedModules, setExpandedModules] = useState<Record<string, boolean>>({
-    "01": true,
+  const [steps,setSteps] = useState<PathStep[]>([]);
+  const [currentPath,setCurrentPath] = useState<PathInformation>();
+  const [isLoading,setIsLoading] = useState(true)
+  const [expandedSteps, setExpandedSteps] = useState<Record<number, boolean>>({
+	1: true,
   });
 
-  const completedCount = modules.filter((m) => m.completed).length;
-  const progressPercent = Math.round((completedCount / modules.length) * 100);
+  useEffect(() => {
+    // 1. Safe to access localStorage on the client inside useEffect
+    const path = retrieveCurrentPath();
 
-  const toggleExpand = (id: string) => {
-    setExpandedModules((prev) => ({
+    if (path) {
+      setCurrentPath(path);
+	  setSteps(path.steps)
+    }
+    
+    setIsLoading(false);
+  }, []);
+
+  if (isLoading) {
+    return <div>Loading learning path...</div>;
+  }
+
+  if (!steps.length) {
+    return <div>No learning path found. Please generate one first.</div>;
+  }
+
+  const completedCount = steps.filter((m) => m.completed).length;
+  const progressPercent = Math.round((completedCount / steps.length) * 100);
+
+  const toggleExpand = (position:number) => {
+    setExpandedSteps((prev) => ({
       ...prev,
-      [id]: !prev[id],
+      [position]: !prev[position],
     }));
   };
 
-  const toggleComplete = (id: string, e: React.MouseEvent) => {
+  const toggleComplete = (position: number, e: React.MouseEvent) => {
     e.stopPropagation();
-    setModules((prev) =>
-      prev.map((mod) => (mod.id === id ? { ...mod, completed: !mod.completed } : mod))
+    setSteps((prev) =>
+      prev.map((step) => (step.position === position ? { ...step, completed: !step.completed } : step))
     );
   };
 
+
+  const totalTime= currentPath!.steps.reduce((sum,num)=>sum+Number(num.estimatedTime.split(' ')[0]),0)
+  const unit=currentPath!.steps[0].estimatedTime.split(' ')[1]
 
   return (
     
@@ -149,10 +86,10 @@ export default function LearningPath() {
               <span>Your Personalized Trajectory</span>
             </div>
             <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">
-              Early career <span className="text-slate-400 font-normal">→</span> Front end
+              {currentPath!.formData.currentLevel.toUpperCase()}<span className="text-slate-400 font-normal">→</span> {currentPath!.formData.targetRole.toUpperCase()}
             </h1>
             <p className="text-slate-400 text-sm max-w-2xl">
-              A 4 months path built around 8 hours per week, using a project-based approach.
+              A {currentPath!.formData.desiredTimeframe} path built around {currentPath!.formData.availableTime} hours per week{currentPath!.formData.learningPreference?`, using a ${currentPath!.formData.learningPreference} learning preference.`:'.'}
             </p>
           </div>
 
@@ -262,11 +199,11 @@ export default function LearningPath() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="bg-slate-50 border border-slate-100 rounded-lg p-3">
-                <div className="text-xl font-black text-slate-900">71h</div>
+                <div className="text-xl font-black text-slate-900">{totalTime} {unit}</div>
                 <div className="text-[11px] text-slate-500 font-medium">focused learning</div>
               </div>
               <div className="bg-slate-50 border border-slate-100 rounded-lg p-3">
-                <div className="text-xl font-black text-slate-900">4 months</div>
+                <div className="text-xl font-black text-slate-900">{currentPath!.formData.desiredTimeframe}</div>
                 <div className="text-[11px] text-slate-500 font-medium">target window</div>
               </div>
             </div>
@@ -281,63 +218,57 @@ export default function LearningPath() {
               <h2 className="text-2xl font-bold text-slate-900 mt-0.5">The shortest credible route</h2>
             </div>
             <span className="text-xs text-slate-500 font-medium">
-              {completedCount} of {modules.length} complete
+              {completedCount} of {steps.length} complete
             </span>
           </div>
 
-          {/* Modules Accordion List */}
+          {/* steps Accordion List */}
           <div className="space-y-4">
-            {modules.map((module) => {
-              const isExpanded = !!expandedModules[module.id];
+            {steps.map((step) => {
+              const isExpanded = !!expandedSteps[step.position];
 
               return (
                 <div
-                  key={module.id}
+                  key={step.position}
                   className={`bg-white border rounded-xl transition-all duration-200 overflow-hidden shadow-sm ${
-                    module.completed
+                    step.completed
                       ? "border-emerald-200 bg-emerald-50/10"
                       : "border-slate-200 hover:border-slate-300"
                   }`}
                 >
-                  {/* Module Header Bar */}
+                  {/* step Header Bar */}
                   <div
-                    onClick={() => toggleExpand(module.id)}
+                    onClick={() => toggleExpand(step.position)}
                     className="p-5 flex items-start justify-between cursor-pointer select-none"
                   >
                     <div className="flex items-start space-x-4 ">
                       {/* Badge / Number Circle */}
                       <button
-                        onClick={(e) => toggleComplete(module.id, e)}
+                        onClick={(e) => toggleComplete(step.position, e)}
                         className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0 border transition-all ${
-                          module.completed
+                          step.completed
                             ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-600 dark:bg-emerald-500/20 dark:border-emerald-500/40 dark:text-emerald-400"
                             : "bg-(--signal-strong)/10 border-(--signal-strong) text-(--signal-strong) hover:opacity-80"
                         }`}
-                        title={module.completed ? "Mark incomplete" : "Mark complete"}
+                        title={step.completed ? "Mark incomplete" : "Mark complete"}
                       >
-                        {module.completed ? (
+                        {step.completed ? (
                           <Check className="w-5 h-5 stroke-[2.5]" />
                         ) : (
-                          <span>{module.id}</span>
+                          <span>{step.position}</span>
                         )}
                       </button>
 
                       {/* Info & Title */}
                       <div className="space-y-1">
                         <div className="flex items-center space-x-2 flex-wrap gap-y-1">
-                          <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded tracking-wider text-signal-strong `}>
-                            {module.badge}
-                          </span>
                           <span className="text-xs  text-slate-500">
-                            {module.hours}
+                            {step.estimatedTime}
                           </span>
                           <span className="text-slate-300 text-xs">•</span>
-                          <span className="text-xs  text-slate-500">
-                            {module.level}
-                          </span>
                         </div>
                         <h3 className="text-lg font-bold text-slate-900 transition-colors">
-                          {module.title}
+                          {step.title}
                         </h3>
                       </div>
                     </div>
@@ -352,7 +283,7 @@ export default function LearningPath() {
                     </div>
                   </div>
 
-                  {/* Module Expanded Details */}
+                  {/* step Expanded Details */}
                   {isExpanded && (
                     <div className="px-5 pb-5 pt-2 border-t border-slate-100  grid  gap-4">
                       <div className="grid grid-cols-1 md:grid-cols-3 ">
@@ -362,31 +293,27 @@ export default function LearningPath() {
                             WHY THIS MATTERS
                           </h4>
                           <p className="text-sm text-slate-600 leading-relaxed">
-                            {module.whyItMatters}
+                            {step.whyItMatters}
                           </p>
+						  <h4 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+							DESCRIPTION
+						  </h4>
+						  <p className="text-sm text-slate-600 leading-relaxed pb-4 md:pb-0">
+							{step.description}
+						  </p>
                         </div>
 
-                        {/* Depends On & Action Button */}
                         <div className="space-y-3 flex flex-col justify-between">
                           <div>
-                            <h4 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                              DEPENDS ON
-                            </h4>
-                            <p className="text-sm font-medium text-slate-700 mt-1">
-                              {module.dependsOn}
-                            </p>
-                          </div>
-
-                          <div>
                             <button
-                              onClick={(e) => toggleComplete(module.id, e)}
+                              onClick={(e) => toggleComplete(step.position, e)}
                               className={`w-full hover:cursor-pointer text-xs font-semibold py-2 px-4 rounded-md border transition-all flex items-center justify-center space-x-1.5 ${
-                                module.completed
+                                step.completed
                                   ? "bg-white border-slate-300 text-slate-700 hover:bg-slate-50"
                                   : "bg-[#0c142b] border-[#0c142b] text-white hover:bg-slate-800 shadow-sm"
                               }`}
                             >
-                              {module.completed ? (
+                              {step.completed ? (
                                 <>
                                   <span className="text-slate-400 ">✕</span>
                                   <span>Mark incomplete</span>
@@ -401,36 +328,7 @@ export default function LearningPath() {
                           </div>
                         </div>
                       </div>
-<div className="grid grid-cols-1 md:grid-cols-2 ">
-                      {/* Recommended Resources List */}
-                      {module.resources && module.resources.length > 0 && (
-                        <div className="space-y-2 mt-2">
-                          <h4 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                            RECOMMENDED RESOURCES
-                          </h4>
-                          <div className="space-y-2">
-                            {module.resources.map((res, idx) => (
-                              <div
-                                key={idx}
-                                className="border border-slate-200 rounded-lg p-3 flex items-center justify-between hover:border-slate-300 hover:bg-slate-50/50 transition-all group cursor-pointer"
-                              >
-                                <div className="flex items-center space-x-2.5">
-                                  <BookOpen className="w-4 h-4 text-sky-600" />
-                                  <span className="text-xs font-semibold text-slate-800 group-hover:text-sky-600 transition-colors">
-                                    {res.title}
-                                  </span>
-                                  <span className="text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded font-medium">
-                                    {res.type}
-                                  </span>
-                                </div>
-                                <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 transition-transform group-hover:translate-x-0.5" />
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
                       </div>
-                    </div>
                   )}
                 </div>
               );
