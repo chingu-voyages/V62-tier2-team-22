@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { Check, FlaskConical } from "lucide-react";
-import { InteractiveGrid } from "../../components/career-profile/InteractiveGrid";
+import { InteractiveGrid } from "@/components/career-profile/InteractiveGrid";
+import { useRouter } from "next/navigation"; // 1. استيراد useRouter
 
 interface AnalysisEngineProps {
   targetRole?: string;
@@ -23,6 +24,7 @@ export default function AnalysisEngine({
   onComplete,
 }: AnalysisEngineProps) {
   const [analysisStep, setAnalysisStep] = useState(1);
+  const router = useRouter(); // 2. تهيئة useRouter
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -40,14 +42,19 @@ export default function AnalysisEngine({
   }, []);
 
   useEffect(() => {
-    if (analysisStep === ANALYSIS_LABELS.length && onComplete) {
+    // 3. عند انتهاء جميع الخطوات
+    if (analysisStep === ANALYSIS_LABELS.length) {
       const timeout = setTimeout(() => {
-        onComplete();
+        if (onComplete) {
+          onComplete(); // إذا كانت ممررة كـ prop (مثلاً داخل modal أو حالة)
+        } else {
+          router.push("/learning-path"); // التوجيه التلقائي للمسار المطلوب عند زيارة الرابط مباشرة
+        }
       }, 1000);
 
       return () => clearTimeout(timeout);
     }
-  }, [analysisStep, onComplete]);
+  }, [analysisStep, onComplete, router]);
 
   return (
     <div className="relative min-h-screen bg-[#030712] text-slate-100 flex flex-col items-center justify-center p-4 font-sans overflow-hidden">

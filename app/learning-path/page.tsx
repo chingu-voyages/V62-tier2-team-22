@@ -5,19 +5,22 @@ import {
   ChevronDown,
   ChevronUp,
   Check,
-  BookOpen,
+    BookOpen,
   ArrowRight,
   Sparkles,
   Clock,
 } from "lucide-react";
 import Link from 'next/link';
+import { useRouter } from "next/navigation";
+import AnalysisEngine from "@/app/AnalysisEngine/page";
+import Navbar from "@/components/career-profile/Navbar";
+import Footer from "@/components/career-profile/Footer";
 interface Resource {
   title: string;
   type: string;
   url?: string;
 }
-import Navbar from "@/components/career-profile/Navbar";
-import Footer from "@/components/career-profile/Footer"; 
+
 interface Module {
   id: string;
   badge: string;
@@ -120,8 +123,18 @@ export default function LearningPath() {
     "01": true,
   });
 
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisStep, setAnalysisStep] = useState(1);
+  const [targetRole, setTargetRole] = useState("Front end");
+
   const completedCount = modules.filter((m) => m.completed).length;
   const progressPercent = Math.round((completedCount / modules.length) * 100);
+  const router = useRouter();
+
+  const handleAnalysisComplete = () => {
+    setIsAnalyzing(false);
+    router.push("/learning-path");
+  };
 
   const toggleExpand = (id: string) => {
     setExpandedModules((prev) => ({
@@ -137,12 +150,21 @@ export default function LearningPath() {
     );
   };
 
+  if (isAnalyzing) {
+    return (
+      <AnalysisEngine
+        targetRole={targetRole || "Target Role"}
+        analysisStep={analysisStep}
+        onComplete={handleAnalysisComplete}
+      />
+    );
+  }
 
   return (
     
-    <div className="min-h-screen bg-[#fafbfc] text-slate-800 pb-16">
+    <div className="min-h-screen bg-[#fafbfc] text-slate-800 pb-1">
       {/* Top Header Bar */}
-<Navbar />
+      <Navbar/>
       {/* Hero Banner Header */}
       <div className="bg-[#0b1329] text-white px-6 py-10">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
@@ -160,7 +182,7 @@ export default function LearningPath() {
           </div>
 
           {/* Path Progress Box */}
-          <div className="bg-[#121c38] border border-slate-800 rounded-lg p-4 min-w-[280px] w-full md:w-auto shadow-lg">
+          <div className="bg-[#121c38] border border-slate-800 rounded-lg p-4 min-w-70 w-full md:w-auto shadow-lg">
             <div className="flex justify-between items-center text-xs font-semibold mb-2">
               <span className="text-slate-400">Path progress</span>
               <span className="text-sky-400 font-bold">{progressPercent}%</span>
@@ -314,7 +336,7 @@ export default function LearningPath() {
                         className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0 border transition-all ${
                           module.completed
                             ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-600 dark:bg-emerald-500/20 dark:border-emerald-500/40 dark:text-emerald-400"
-                            : "bg-[var(--signal-strong)]/10 border-[var(--signal-strong)] text-[var(--signal-strong)] hover:opacity-80"
+                            : "bg-(--signal-strong)/10 border-(--signal-strong) text-(--signal-strong) hover:opacity-80"
                         }`}
                         title={module.completed ? "Mark incomplete" : "Mark complete"}
                       >
