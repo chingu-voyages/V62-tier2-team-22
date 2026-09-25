@@ -1,8 +1,8 @@
 "use client";
 
 import {retrieveCurrentPath} from '@/lib/storage'
-import { PathStep } from "@/schemas/learningPathSchemas";
 import React, { useState,useEffect } from "react";
+import { PathStep } from "@/schemas/learningPathSchemas";
 import { PathInformation } from '@/schemas/learningPathSchemas';
 import {
   ChevronDown,
