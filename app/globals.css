@@ -33,6 +33,7 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --signal-strong: oklch(64% 0.17 219);
   }
 }
 
@@ -44,4 +45,7 @@ body {
 
 @theme {
 	--color-path-background:#071523;
+}
+.text-signal-strong {
+  color: var(--signal-strong);
 }

@@ -3,11 +3,10 @@
 import React, { useState } from 'react';
 import { 
   ArrowLeft, 
-  RotateCcw, 
   Clock, 
   ArrowRight 
 } from 'lucide-react';
-
+import Link from 'next/link';
 // Interfaces for component state & props
 interface Module {
   id: number;
@@ -30,21 +29,19 @@ export default function CareerProgress() {
     { id: 5, title: 'Interview narratives & gap review', status: 'Not started', duration: '7 hours' },
   ];
 
-  const handleStartOver = (): void => {
-    setCompletionPercentage(0);
-    setCompletedCount(0);
-    setCurrentModuleIndex(1);
-  };
-
   return (
-    <div className="min-h-screen bg-gray-50 text-slate-800 font-sans antialiased">
+    <div className="min-h-screen bg-gray-50 text-slate-800  antialiased">
       {/* Main Container */}
       <main className="max-w-7xl mx-auto px-6 py-6">
+
         {/* Back Link */}
-        <button className="flex items-center space-x-2 text-sm font-medium text-gray-600 hover:text-slate-900 mb-6 transition-colors">
+        <Link 
+          href="/learning-path" 
+          className="items-center space-x-2 text-sm font-medium text-gray-600 hover:text-slate-900 mb-6 transition-colors inline-flex"
+        >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to path</span>
-        </button>
+        </Link>
 
         {/* Top Section Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-10">
@@ -110,16 +107,19 @@ export default function CareerProgress() {
             <div>
               <div className="flex items-center justify-between text-sm text-gray-500 border-t border-gray-100 pt-4 mb-6">
                 <div className="flex items-center space-x-1.5">
-                  <Clock className="w-4 h-4 text-gray-400" />
+                  <Clock className="w-4 h-4 text-signal-strong" />
                   <span>8 hours</span>
                 </div>
                 <span className="font-medium text-gray-600">Foundation</span>
               </div>
 
-              <button className="w-full bg-[#0b1320] hover:bg-slate-800 text-white font-medium py-3 px-4 rounded-lg flex items-center justify-center space-x-2 transition-colors">
+              <Link 
+                href="/learning-path" 
+                className="w-full bg-[#0b1320] hover:bg-slate-800 text-white font-medium py-3 px-4 rounded-lg flex items-center justify-center space-x-2 transition-colors"
+              >
                 <span>Continue learning</span>
                 <ArrowRight className="w-4 h-4" />
-              </button>
+              </Link>
             </div>
           </div>
 

@@ -34,12 +34,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased  ${spaceGrotesk.variable}`}
     >
-      <body className="min-h-screen flex flex-col">
+      <body className="min-h-full flex flex-col">
 		<Providers>
 			<Navbar/>
-				<main className="flex-1">
-					{children}
-				</main>
+			<main className="flex-1">{children}</main>
 			<Footer/>
 		</Providers>
 	  </body>

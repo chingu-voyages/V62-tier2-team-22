@@ -1,5 +1,5 @@
 import Link from "next/link";
-import GridBackground from "@/components/career-profile/InteractiveGrid";
+import GridBackground from "@/components/career-profile/GridBackground";
 export default function Home() {
   return (
    <div className="bg-[#040914] text-white min-h-screen bg-grid-pattern relative flex flex-col justify-between overflow-x-hidden">
@@ -8,7 +8,7 @@ export default function Home() {
 
 <GridBackground> 
       {/* Main Content Layout - Grid View */}
-      <main className="max-w-7xl mx-auto px-6 py-8 relative z-10 flex-1 w-full flex items-center">
+      <main className="max-w-7xl mx-auto px-6 sm:px-16 py-8 relative z-10 flex-1 w-full flex items-center">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center w-full">
           
           {/* Left Column: Hero Text & Action */}
@@ -106,9 +106,6 @@ export default function Home() {
         </div>
       </main>
       </GridBackground>
-	  
-
-      
     </div>
 	
   );

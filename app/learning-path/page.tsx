@@ -7,17 +7,15 @@ import {
   Check,
   BookOpen,
   ArrowRight,
-  RotateCcw,
   Sparkles,
   Clock,
 } from "lucide-react";
-
+import Link from 'next/link';
 interface Resource {
   title: string;
   type: string;
   url?: string;
 }
-
 interface Module {
   id: string;
   badge: string;
@@ -137,44 +135,11 @@ export default function LearningPath() {
     );
   };
 
-  const handleStartOver = () => {
-    setModules((prev) => prev.map((m) => ({ ...m, completed: false })));
-  };
 
   return (
-    <div className="min-h-screen bg-[#fafbfc] text-slate-800 font-sans pb-16">
+    
+    <div className="min-h-screen bg-[#fafbfc] text-slate-800 pb-16">
       {/* Top Header Bar */}
-      <header className="border-b border-slate-200 bg-white sticky top-0 z-30 px-6 py-3.5 shadow-sm">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center space-x-8">
-            <div className="flex items-center space-x-2 font-bold text-xl tracking-tight text-slate-900">
-              <span className="bg-slate-900 text-white rounded p-1 text-xs">M</span>
-              <span>Masari.</span>
-            </div>
-
-            <nav className="hidden md:flex items-center space-x-6 text-sm font-medium text-slate-600">
-              <a href="#" className="hover:text-slate-900 transition-colors">Home</a>
-              <a href="#" className="hover:text-slate-900 transition-colors">Career profile</a>
-              <a href="#" className="text-slate-900 font-semibold border-b-2 border-slate-900 pb-0.5">Learning path</a>
-              <a href="#" className="hover:text-slate-900 transition-colors">Progress</a>
-            </nav>
-          </div>
-
-          <div className="flex items-center space-x-4">
-            <span className="text-sm font-semibold text-slate-700">
-              {progressPercent}% complete
-            </span>
-            <button
-              onClick={handleStartOver}
-              className="flex items-center space-x-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-md transition-all"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span>Start over</span>
-            </button>
-          </div>
-        </div>
-      </header>
-
       {/* Hero Banner Header */}
       <div className="bg-[#0b1329] text-white px-6 py-10">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
@@ -192,7 +157,7 @@ export default function LearningPath() {
           </div>
 
           {/* Path Progress Box */}
-          <div className="bg-[#121c38] border border-slate-800 rounded-lg p-4 min-w-[280px] w-full md:w-auto shadow-lg">
+          <div className="bg-[#121c38] border border-slate-800 rounded-lg p-4 min-w-70 w-full md:w-auto shadow-lg">
             <div className="flex justify-between items-center text-xs font-semibold mb-2">
               <span className="text-slate-400">Path progress</span>
               <span className="text-sky-400 font-bold">{progressPercent}%</span>
@@ -203,10 +168,13 @@ export default function LearningPath() {
                 style={{ width: `${progressPercent}%` }}
               ></div>
             </div>
-            <button className="w-full text-xs font-semibold text-slate-200 hover:text-white bg-slate-800/80 hover:bg-slate-800 py-2 rounded flex items-center justify-center space-x-1 border border-slate-700/50 transition-colors">
-              <span>Open progress view</span>
-              <ArrowRight className="w-3.5 h-3.5 ml-1" />
-            </button>
+            <Link 
+  href="/progress" 
+  className="w-full text-xs font-semibold text-slate-200 hover:text-white bg-slate-800/80 hover:bg-slate-800 py-2 rounded flex items-center justify-center space-x-1 border border-slate-700/50 transition-colors"
+>
+  <span>Open progress view</span>
+  <ArrowRight className="w-3.5 h-3.5 ml-1" />
+</Link>
           </div>
         </div>
       </div>
@@ -223,9 +191,10 @@ export default function LearningPath() {
                 <span className="text-[11px] font-bold text-sky-600 tracking-wider uppercase">Skill Gap Model</span>
                 <h3 className="text-base font-bold text-slate-900 mt-0.5">Current → target</h3>
               </div>
-              <div className="w-6 h-6 rounded-full border-2 border-dashed border-sky-500 flex items-center justify-center text-sky-500 text-xs font-bold">
-                C
-              </div>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="oklch(64% 0.17 219)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-gauge size-5 text-signal-strong" aria-hidden="true">
+  <path d="m12 14 4-4"></path>
+  <path d="M3.34 19a10 10 0 1 1 17.32 0"></path>
+</svg>
             </div>
 
             <div className="space-y-4">
@@ -288,8 +257,8 @@ export default function LearningPath() {
           {/* Path Estimate Card */}
           <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
             <div className="flex items-center space-x-2 text-slate-700 text-sm font-bold mb-4">
-              <Clock className="w-4 h-4 text-slate-500" />
-              <span>Path estimate</span>
+<Clock className="w-4 h-4 text-signal-strong" />              
+<span>Path estimate</span>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="bg-slate-50 border border-slate-100 rounded-lg p-3">
@@ -335,14 +304,14 @@ export default function LearningPath() {
                     onClick={() => toggleExpand(module.id)}
                     className="p-5 flex items-start justify-between cursor-pointer select-none"
                   >
-                    <div className="flex items-start space-x-4">
+                    <div className="flex items-start space-x-4 ">
                       {/* Badge / Number Circle */}
                       <button
                         onClick={(e) => toggleComplete(module.id, e)}
                         className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0 border transition-all ${
                           module.completed
-                            ? "bg-emerald-500 border-emerald-500 text-white shadow-sm"
-                            : "bg-white border-slate-300 text-slate-600 hover:border-slate-400"
+                            ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-600 dark:bg-emerald-500/20 dark:border-emerald-500/40 dark:text-emerald-400"
+                            : "bg-(--signal-strong)/10 border-(--signal-strong) text-(--signal-strong) hover:opacity-80"
                         }`}
                         title={module.completed ? "Mark incomplete" : "Mark complete"}
                       >
@@ -356,18 +325,18 @@ export default function LearningPath() {
                       {/* Info & Title */}
                       <div className="space-y-1">
                         <div className="flex items-center space-x-2 flex-wrap gap-y-1">
-                          <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded tracking-wider ${module.badgeColor}`}>
+                          <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded tracking-wider text-signal-strong `}>
                             {module.badge}
                           </span>
-                          <span className="text-xs font-semibold text-slate-500">
+                          <span className="text-xs  text-slate-500">
                             {module.hours}
                           </span>
                           <span className="text-slate-300 text-xs">•</span>
-                          <span className="text-xs font-semibold text-slate-500">
+                          <span className="text-xs  text-slate-500">
                             {module.level}
                           </span>
                         </div>
-                        <h3 className="text-lg font-bold text-slate-900 hover:text-sky-600 transition-colors">
+                        <h3 className="text-lg font-bold text-slate-900 transition-colors">
                           {module.title}
                         </h3>
                       </div>
@@ -385,8 +354,8 @@ export default function LearningPath() {
 
                   {/* Module Expanded Details */}
                   {isExpanded && (
-                    <div className="px-5 pb-5 pt-2 border-t border-slate-100 space-y-5 bg-white">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="px-5 pb-5 pt-2 border-t border-slate-100  grid  gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 ">
                         {/* Why This Matters */}
                         <div className="md:col-span-2 space-y-1">
                           <h4 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
@@ -411,7 +380,7 @@ export default function LearningPath() {
                           <div>
                             <button
                               onClick={(e) => toggleComplete(module.id, e)}
-                              className={`w-full text-xs font-semibold py-2 px-4 rounded-md border transition-all flex items-center justify-center space-x-1.5 ${
+                              className={`w-full hover:cursor-pointer text-xs font-semibold py-2 px-4 rounded-md border transition-all flex items-center justify-center space-x-1.5 ${
                                 module.completed
                                   ? "bg-white border-slate-300 text-slate-700 hover:bg-slate-50"
                                   : "bg-[#0c142b] border-[#0c142b] text-white hover:bg-slate-800 shadow-sm"
@@ -419,7 +388,7 @@ export default function LearningPath() {
                             >
                               {module.completed ? (
                                 <>
-                                  <span className="text-slate-400">✕</span>
+                                  <span className="text-slate-400 ">✕</span>
                                   <span>Mark incomplete</span>
                                 </>
                               ) : (
@@ -432,10 +401,10 @@ export default function LearningPath() {
                           </div>
                         </div>
                       </div>
-
+<div className="grid grid-cols-1 md:grid-cols-2 ">
                       {/* Recommended Resources List */}
                       {module.resources && module.resources.length > 0 && (
-                        <div className="space-y-2 pt-2">
+                        <div className="space-y-2 mt-2">
                           <h4 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
                             RECOMMENDED RESOURCES
                           </h4>
@@ -460,6 +429,7 @@ export default function LearningPath() {
                           </div>
                         </div>
                       )}
+                      </div>
                     </div>
                   )}
                 </div>
@@ -469,5 +439,6 @@ export default function LearningPath() {
         </section>
       </main>
     </div>
+    
   );
 }
