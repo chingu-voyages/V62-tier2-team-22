@@ -1,7 +1,9 @@
 "use client";
 
+import {retrieveCurrentPath} from '@/lib/storage'
 import { PathStep } from "@/schemas/learningPathSchemas";
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
+import { PathInformation } from '@/schemas/learningPathSchemas';
 import {
   ChevronDown,
   ChevronUp,
@@ -20,59 +22,35 @@ interface Resource {
 }
 
 
-const initialSteps: PathStep[] = [
-  {
-	position:1,
-    estimatedTime: "8 hours",
-    title: "Systems thinking for modern products",
-    whyItMatters:
-      "Build the technical reasoning expected of a Front end, while connecting concepts to your Website.",
-    completed: true,
-	description:"Understand how system operate on different levels, which will help you link different parts of the technical stack together"
-  },
-  {
-	position:2,
-    estimatedTime: "14 hours",
-    title: "Applied TypeScript & API design",
-    whyItMatters:
-      "Close a high-impact implementation gap and create a reliable base for production work.",
-    completed: false,
-	description:"PLACE HOLDER TEXT ***********************************************************"
-  },
-  {
-	position:3,
-    estimatedTime: "18 hours",
-    title: "Front end workflow laboratory",
-    whyItMatters:
-      "Master modern build tools, CI/CD pipelines, and front-end performance profiling.",
-    completed: false,
-	description:"PLACE HOLDER TEXT ***********************************************************"
-  },
-  {
-	position:4,
-    estimatedTime: "24 hours",
-    title: "Portfolio proof project",
-    whyItMatters:
-      "Synthesize all skills into a complex, production-grade application that showcases your capability.",
-    completed: false,
-	description:"PLACE HOLDER TEXT ***********************************************************"
-  },
-  {
-	position:5,
-    estimatedTime: "7 hours",
-    title: "Interview narratives & gap review",
-    whyItMatters:
-      "Prepare to articulate technical trade-offs, architecture decisions, and career experience clearly.",
-    completed: false,
-	description:"PLACE HOLDER TEXT ***********************************************************"
-  },
-];
+
 
 export default function LearningPath() {
-  const [steps,setSteps] = useState<PathStep[]>(initialSteps);
+  const [steps,setSteps] = useState<PathStep[]>([]);
+  const [currentPath,setCurrentPath] = useState<PathInformation>();
+  const [isLoading,setIsLoading] = useState(true)
   const [expandedSteps, setExpandedSteps] = useState<Record<number, boolean>>({
 	1: true,
   });
+
+  useEffect(() => {
+    // 1. Safe to access localStorage on the client inside useEffect
+    const path = retrieveCurrentPath();
+
+    if (path) {
+      setCurrentPath(path);
+	  setSteps(path.steps)
+    }
+    
+    setIsLoading(false);
+  }, []);
+
+  if (isLoading) {
+    return <div>Loading learning path...</div>;
+  }
+
+  if (!steps.length) {
+    return <div>No learning path found. Please generate one first.</div>;
+  }
 
   const completedCount = steps.filter((m) => m.completed).length;
   const progressPercent = Math.round((completedCount / steps.length) * 100);
@@ -92,6 +70,9 @@ export default function LearningPath() {
   };
 
 
+  const totalTime= currentPath!.steps.reduce((sum,num)=>sum+Number(num.estimatedTime.split(' ')[0]),0)
+  const unit=currentPath!.steps[0].estimatedTime.split(' ')[1]
+
   return (
     
     <div className="min-h-screen bg-[#fafbfc] text-slate-800 pb-16">
@@ -105,10 +86,10 @@ export default function LearningPath() {
               <span>Your Personalized Trajectory</span>
             </div>
             <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">
-              Early career <span className="text-slate-400 font-normal">→</span> Front end
+              {currentPath!.formData.currentLevel.toUpperCase()}<span className="text-slate-400 font-normal">→</span> {currentPath!.formData.targetRole.toUpperCase()}
             </h1>
             <p className="text-slate-400 text-sm max-w-2xl">
-              A 4 months path built around 8 hours per week, using a project-based approach.
+              A {currentPath!.formData.desiredTimeframe} path built around {currentPath!.formData.availableTime} hours per week{currentPath!.formData.learningPreference?`, using a ${currentPath!.formData.learningPreference} learning preference.`:'.'}
             </p>
           </div>
 
@@ -218,11 +199,11 @@ export default function LearningPath() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="bg-slate-50 border border-slate-100 rounded-lg p-3">
-                <div className="text-xl font-black text-slate-900">71h</div>
+                <div className="text-xl font-black text-slate-900">{totalTime} {unit}</div>
                 <div className="text-[11px] text-slate-500 font-medium">focused learning</div>
               </div>
               <div className="bg-slate-50 border border-slate-100 rounded-lg p-3">
-                <div className="text-xl font-black text-slate-900">4 months</div>
+                <div className="text-xl font-black text-slate-900">{currentPath!.formData.desiredTimeframe}</div>
                 <div className="text-[11px] text-slate-500 font-medium">target window</div>
               </div>
             </div>
@@ -317,7 +298,7 @@ export default function LearningPath() {
 						  <h4 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
 							DESCRIPTION
 						  </h4>
-						  <p className="text-sm text-slate-600 leading-relaxed">
+						  <p className="text-sm text-slate-600 leading-relaxed pb-4 md:pb-0">
 							{step.description}
 						  </p>
                         </div>

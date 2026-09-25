@@ -1,9 +1,10 @@
 import { PathInformation } from "@/schemas/learningPathSchemas";
 
 
-const STORAGE_KEY="storedPaths"
+export const STORAGE_KEY="storedPaths"
+export const CURRENT_INDEX="currentIndex"
 
-export async function storePath(path:PathInformation){
+export function storePath(path:PathInformation){
 	if (typeof window == "undefined") return
 
 	try{
@@ -21,3 +22,25 @@ export async function storePath(path:PathInformation){
 	}
 }
 
+
+export function retrieveCurrentPath(){
+	if (typeof window =="undefined")
+		return
+
+	try{
+		const paths=localStorage.getItem(STORAGE_KEY)
+		const pathArray:PathInformation[]=paths?JSON.parse(paths):[]
+
+		if (pathArray.length==0){
+			return
+		}
+
+		const index=localStorage.getItem(CURRENT_INDEX)
+		const currentIndex:number=index?JSON.parse(index):0
+
+		return pathArray[currentIndex]
+	}
+	catch{
+		return
+	}
+}
