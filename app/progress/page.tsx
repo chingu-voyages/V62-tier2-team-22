@@ -7,8 +7,6 @@ import {
   ArrowRight 
 } from 'lucide-react';
 import Link from 'next/link';
-import Navbar from "@/components/career-profile/Navbar";
-import Footer from "@/components/career-profile/Footer";
 // Interfaces for component state & props
 interface Module {
   id: number;
@@ -33,14 +31,13 @@ export default function CareerProgress() {
 
   return (
     <div className="min-h-screen bg-gray-50 text-slate-800  antialiased">
-      <Navbar />
       {/* Main Container */}
       <main className="max-w-7xl mx-auto px-6 py-6">
 
         {/* Back Link */}
         <Link 
           href="/learning-path" 
-          className="flex items-center space-x-2 text-sm font-medium text-gray-600 hover:text-slate-900 mb-6 transition-colors inline-flex"
+          className="items-center space-x-2 text-sm font-medium text-gray-600 hover:text-slate-900 mb-6 transition-colors inline-flex"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to path</span>
@@ -158,7 +155,6 @@ export default function CareerProgress() {
           </div>
         </section>
       </main>
-      <Footer />
     </div>
   );
 }

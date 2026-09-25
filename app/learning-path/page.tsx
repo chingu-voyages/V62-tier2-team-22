@@ -164,7 +164,9 @@ export default function LearningPath() {
     
     <div className="min-h-screen bg-[#fafbfc] text-slate-800 pb-1">
       {/* Top Header Bar */}
+
       <Navbar/>
+
       {/* Hero Banner Header */}
       <div className="bg-[#0b1329] text-white px-6 py-10">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
@@ -463,7 +465,7 @@ export default function LearningPath() {
           </div>
         </section>
       </main>
-      <Footer />
+      <Footer/>
     </div>
     
   );
