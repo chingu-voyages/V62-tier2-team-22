@@ -2,20 +2,20 @@ import { PathInformation } from "@/schemas/learningPathSchemas";
 
 
 export const STORAGE_KEY="storedPaths"
-export const CURRENT_INDEX="currentIndex"
+export const CURRENT_PATH_ID="currentPathId"
 
 export function storePath(path:PathInformation){
 	if (typeof window == "undefined") return
 
 	try{
 		const pathStorage = localStorage.getItem(STORAGE_KEY)
+		const pathDictionary:Record<string,PathInformation> =pathStorage?JSON.parse(pathStorage):{}
 
-		const pathArray:PathInformation[]=pathStorage?JSON.parse(pathStorage):[]
-		pathArray.push(path)
+		pathDictionary[path.id]=path
 
-		localStorage.setItem(STORAGE_KEY,JSON.stringify(pathArray))
+		localStorage.setItem(STORAGE_KEY,JSON.stringify(pathDictionary))
+		localStorage.setItem(CURRENT_PATH_ID,path.id)
 	
-		console.log("stored!!")
 	}
 	catch(e){
 		console.error("failed to store path in local storage",e)
@@ -28,17 +28,19 @@ export function retrieveCurrentPath(){
 		return
 
 	try{
-		const paths=localStorage.getItem(STORAGE_KEY)
-		const pathArray:PathInformation[]=paths?JSON.parse(paths):[]
+		const storedId=localStorage.getItem(CURRENT_PATH_ID)
+		if (storedId==null){
+			return
+		}		
 
-		if (pathArray.length==0){
+		const paths=localStorage.getItem(STORAGE_KEY)
+		const pathDictionary:Record<string,PathInformation> =paths?JSON.parse(paths):{}
+
+		if (!Object.hasOwn(pathDictionary,storedId)){
 			return
 		}
 
-		const index=localStorage.getItem(CURRENT_INDEX)
-		const currentIndex:number=index?JSON.parse(index):0
-
-		return pathArray[currentIndex]
+		return pathDictionary[storedId]
 	}
 	catch{
 		return

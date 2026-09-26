@@ -33,7 +33,6 @@ export default function LearningPath() {
   });
 
   useEffect(() => {
-    // 1. Safe to access localStorage on the client inside useEffect
     const path = retrieveCurrentPath();
 
     if (path) {
