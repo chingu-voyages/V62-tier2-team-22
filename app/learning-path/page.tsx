@@ -302,7 +302,7 @@ export default function LearningPath() {
 						  </p>
                         </div>
 
-                        <div className="space-y-3 flex flex-col justify-between">
+                        <div className="space-y-3 flex flex-col justify-between md:pl-6">
                           <div>
                             <button
                               onClick={(e) => toggleComplete(step.position, e)}
