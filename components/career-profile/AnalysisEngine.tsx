@@ -1,11 +1,13 @@
 "use client";
 
+import React, { useState, useEffect } from "react";
 import { Check, FlaskConical } from "lucide-react";
-import { InteractiveGrid } from "../../components/career-profile/InteractiveGrid";
+import { GridBackground } from "./GridBackground";
 
 interface AnalysisEngineProps {
   targetRole?: string;
   analysisStep?: number;
+  onComplete?: () => void;
 }
 
 const ANALYSIS_LABELS = [
@@ -18,8 +20,35 @@ const ANALYSIS_LABELS = [
 
 export default function AnalysisEngine({
   targetRole = "Front end",
-  analysisStep = 1,
+  onComplete,
 }: AnalysisEngineProps) {
+  const [analysisStep, setAnalysisStep] = useState(1);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setAnalysisStep((prev) => {
+        if (prev < ANALYSIS_LABELS.length) {
+          return prev + 1;
+        } else {
+          clearInterval(interval);
+          return prev;
+        }
+      });
+    }, 1200);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    if (analysisStep === ANALYSIS_LABELS.length && onComplete) {
+      const timeout = setTimeout(() => {
+        onComplete();
+      }, 1000);
+
+      return () => clearTimeout(timeout);
+    }
+  }, [analysisStep, onComplete]);
+
   return (
     <div className="relative min-h-screen bg-[#030712] text-slate-100 flex flex-col items-center justify-center p-4 font-sans overflow-hidden">
       <div
@@ -32,7 +61,7 @@ export default function AnalysisEngine({
           backgroundSize: "40px 40px",
         }}
       />
-      <InteractiveGrid>
+      <GridBackground>
         <div className="relative z-10 w-full max-w-2xl text-center px-4 mx-auto">
           <div className="mx-auto w-16 h-16 rounded-full bg-emerald-950/40 border border-cyan-500/30 flex items-center justify-center mb-6 shadow-[0_0_25px_rgba(6,182,212,0.15)]">
             <FlaskConical className="w-7 h-7 text-cyan-400" />
@@ -105,7 +134,7 @@ export default function AnalysisEngine({
             Keep this tab open · typically under 10 seconds
           </p>
         </div>
-      </InteractiveGrid>
+      </GridBackground>
     </div>
   );
 }
