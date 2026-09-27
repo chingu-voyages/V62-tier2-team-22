@@ -47,7 +47,7 @@ export default function StepBackground({ formData, onChange, errors }: StepBackg
 
 				</label>
 				<p className="text-xs text-slate-400 mb-2">
-					Mention any skills you're confident in using today	
+					Mention any skills you&apos;re confident in using today	
 				</p>
 
 				<textarea

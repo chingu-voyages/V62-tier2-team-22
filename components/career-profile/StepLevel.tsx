@@ -18,7 +18,7 @@ export default function StepLevel({ formData, onChange, errors }: StepLevelProps
         <label className="block text-sm font-medium text-slate-800 mb-1">
           Relevant experience <span className="text-cyan-600">*</span>
         </label>
-        <p className="text-xs text-slate-400 mb-2">Mention 1-2 real projects, apps shipped, or production systems you've worked on</p>
+        <p className="text-xs text-slate-400 mb-2">Mention 1-2 real projects, apps shipped, or production systems you&apos;ve worked on</p>
         <textarea
           rows={3}
           value={formData.relevantExperience || ""}
