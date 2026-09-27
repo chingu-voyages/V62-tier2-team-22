@@ -28,7 +28,7 @@ export default function StepGoal({ formData, onChange, errors }: StepGoalProps) 
         <label className="block text-sm font-medium text-slate-800 mb-1">
           Target role <span className="text-cyan-600">*</span>
         </label>
-        <p className="text-xs text-slate-400 mb-2">The specific job title you're aiming for</p>
+        <p className="text-xs text-slate-400 mb-2">The specific job title you&apos;re aiming for</p>
         <input
           type="text"
           value={formData.targetRole || ""}
