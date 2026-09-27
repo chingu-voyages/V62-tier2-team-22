@@ -9,11 +9,11 @@ interface FooterProps {
 }
 
 export const Footer: React.FC<FooterProps> = ({ appName = "Masari" }) => {
-  const [currentYear,setCurrentYear]=useState(2026)
-
-  useEffect(()=>{
-	setCurrentYear(new Date().getFullYear())
+  const [currentYear]=useState(()=>{
+	if (typeof window == "undefined") return 2026
+	return new Date().getFullYear()
   })
+
   return (
     <footer className="w-full border-t border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950">
       <div className="mx-auto max-w-7xl px-6 py-8 sm:px-10 lg:px-16">

@@ -14,23 +14,17 @@ import { PathInformation } from '@/schemas/learningPathSchemas';
 
 export default function CareerProgress() {
   const [steps,setSteps] = useState<PathStep[]>([]);
-  const [currentPath,setCurrentPath] = useState<PathInformation>();
+  const [currentPath] = useState<PathInformation | null>(()=>{
+	if (typeof window=="undefined") return null
+	return retrieveCurrentPath()?? null
+  });
   const [isLoading,setIsLoading] = useState(true)
   const [completionPercentage, setCompletionPercentage] = useState<number>(0);
   const [completedCount, setCompletedCount] = useState<number>(0);
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(1);
 
-  useEffect(() => {
-    // 1. Safe to access localStorage on the client inside useEffect
-    const path = retrieveCurrentPath();
-
-    if (path) {
-      setCurrentPath(path);
-	  setSteps(path.steps)
-    }
-    
-    setIsLoading(false);
-  }, []);
+  
+  setSteps(currentPath?.steps??[])
 
   if (isLoading) {
     return <div>Loading learning path...</div>;

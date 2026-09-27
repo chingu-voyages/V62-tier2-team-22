@@ -8,42 +8,27 @@ import {
   ChevronDown,
   ChevronUp,
   Check,
-  BookOpen,
   ArrowRight,
   Sparkles,
   Clock,
 } from "lucide-react";
 import Link from 'next/link';
 
-interface Resource {
-  title: string;
-  type: string;
-  url?: string;
-}
-
-
-
 
 export default function LearningPath() {
   const [steps,setSteps] = useState<PathStep[]>([]);
-  const [currentPath,setCurrentPath] = useState<PathInformation>();
+  const [currentPath] = useState<PathInformation | null>(()=>{
+	if (typeof window=="undefined") return null
+	return retrieveCurrentPath()?? null
+  });
   const [isLoading,setIsLoading] = useState(true)
   const [expandedSteps, setExpandedSteps] = useState<Record<number, boolean>>({
 	1: true,
   });
 
-  useEffect(() => {
-    const path = retrieveCurrentPath();
+  setSteps(currentPath?.steps??[])
 
-    if (path) {
-      setCurrentPath(path);
-	  setSteps(path.steps)
-    }
-    
-    setIsLoading(false);
-  }, []);
-
-  if (isLoading) {
+   if (isLoading) {
     return <div>Loading learning path...</div>;
   }
 
