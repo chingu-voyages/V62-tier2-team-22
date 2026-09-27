@@ -46,6 +46,7 @@ Return only valid JSON in this format:
 }
 
 Requirements:
+- If Career goal didn't refer to an actual role, abort and return an error
 - Generate between 3 and 10 ordered learning steps.
 - Give each step a clear and specific title.
 - Focus each step on one main skill or learning outcome.
