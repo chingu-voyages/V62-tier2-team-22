@@ -1,6 +1,6 @@
 "use client";
 
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import StepGoal from "@/components/career-profile/StepGoal";
 import StepLevel from "@/components/career-profile/StepLevel";
 import StepBackground from "@/components/career-profile/StepBackground";
@@ -10,182 +10,176 @@ import { learningPathRequest, learningPathRequestSchemas } from "../../schemas/f
 import { Check, Compass, Layers, BookOpen, Target } from "lucide-react";
 import type { LearningPathResponse, PathInformation } from "@/schemas/learningPathSchemas";
 import { storePath } from "@/lib/storage";
-import {useRouter} from 'next/navigation'
+import { useRouter } from 'next/navigation'
 
 type FieldValue = string | string[] | number | undefined;
 
 const STEPS = [
-  { id: 1, title: "Destination", num: "01", heading: "Where do you want to go?", icon: Target, comp: StepGoal },
-  { id: 2, title: "Starting point", num: "02", heading: "What do you already know?", icon: Layers, comp: StepBackground },
-  { id: 3, title: "Your context", num: "03", heading: "What experience do you bring?", icon: BookOpen, comp: StepLevel },
-  { id: 4, title: "Learning mode", num: "04", heading: "How do you want to learn?", icon: Compass, comp: StepCommitment },
+	{ id: 1, title: "Destination", num: "01", heading: "Where do you want to go?", icon: Target, comp: StepGoal },
+	{ id: 2, title: "Starting point", num: "02", heading: "What do you already know?", icon: Layers, comp: StepBackground },
+	{ id: 3, title: "Your context", num: "03", heading: "What experience do you bring?", icon: BookOpen, comp: StepLevel },
+	{ id: 4, title: "Learning mode", num: "04", heading: "How do you want to learn?", icon: Compass, comp: StepCommitment },
 ];
 
 export default function CareerProfilePage() {
-  const router = useRouter();
-  const [step, setStep] = useState(1);
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [generationError, setGenerationError] = useState("");
-  const [learningPath, setLearningPath] = useState<LearningPathResponse | null>(null);
+	const router = useRouter();
+	const [step, setStep] = useState(1);
+	const [errors, setErrors] = useState<{ [key: string]: string }>({});
+	const [isGenerating, setIsGenerating] = useState(false);
+	const [generationError, setGenerationError] = useState("");
+	const [learningPath, setLearningPath] = useState<LearningPathResponse | null>(null);
 
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [analysisStep, setAnalysisStep] = useState(1);
+	const [isAnalyzing, setIsAnalyzing] = useState(false);
+	const [analysisStep, setAnalysisStep] = useState(1);
 
-  const [formData, setFormData] = useState<learningPathRequest>({
-    targetRole: "",
-    currentLevel: "beginner",
-    background: "",
-    skills: "",
-    relevantExperience: "",
-    whyGoalMatters: "",
-    availableTime: 8,
-    desiredTimeframe: "2 months",
-    learningPreference: "Project-based",
-  });
+	const [formData, setFormData] = useState<learningPathRequest>({
+		targetRole: "",
+		currentLevel: "beginner",
+		background: "",
+		skills: "",
+		relevantExperience: "",
+		whyGoalMatters: "",
+		availableTime: 8,
+		desiredTimeframe: "2 months",
+		learningPreference: "Project-based",
+	});
 
-  useEffect(() => {
-  if (learningPath) {
-      router.replace("/learning-path");
-  }
-  }, [learningPath, router]);
+	useEffect(() => {
+		if (learningPath) {
+			router.replace("/learning-path");
+		}
+	}, [learningPath, router]);
 
-  const updateField = (field: keyof learningPathRequest, value: FieldValue) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    setLearningPath(null);
-    setGenerationError("");
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: "" }));
-    }
-  };
+	const updateField = (field: keyof learningPathRequest, value: FieldValue) => {
+		setFormData((prev) => ({ ...prev, [field]: value }));
+		setLearningPath(null);
+		setGenerationError("");
+		if (errors[field]) {
+			setErrors((prev) => ({ ...prev, [field]: "" }));
+		}
+	};
 
-  const validateCurrentStep = () => {
-    let schemaToValidate;
+	const validateCurrentStep = () => {
+		let schemaToValidate;
 
-    if (step === 1) {
-      schemaToValidate = learningPathRequestSchemas.pick({
-        targetRole: true,
-        currentLevel: true,
-      });
-    } else if (step === 2) {
-      schemaToValidate = learningPathRequestSchemas.pick({
-        background: true,
-        skills: true,
-      });
-    } else if (step === 3) {
-      schemaToValidate = learningPathRequestSchemas.pick({
-        relevantExperience: true,
-      });
-    } else if (step === 4) {
-      schemaToValidate = learningPathRequestSchemas.pick({
-        availableTime: true,
-        desiredTimeframe: true,
-        learningPreference: true,
-      });
-    }
+		if (step === 1) {
+			schemaToValidate = learningPathRequestSchemas.pick({
+				targetRole: true,
+				currentLevel: true,
+			});
+		} else if (step === 2) {
+			schemaToValidate = learningPathRequestSchemas.pick({
+				background: true,
+				skills: true,
+			});
+		} else if (step === 3) {
+			schemaToValidate = learningPathRequestSchemas.pick({
+				relevantExperience: true,
+			});
+		} else if (step === 4) {
+			schemaToValidate = learningPathRequestSchemas.pick({
+				availableTime: true,
+				desiredTimeframe: true,
+				learningPreference: true,
+			});
+		}
 
-    if (!schemaToValidate) return true;
+		if (!schemaToValidate) return true;
 
-    const result = schemaToValidate.safeParse(formData);
+		const result = schemaToValidate.safeParse(formData);
 
-    if (!result.success) {
-      const newErrors: { [key: string]: string } = {};
-      result.error.issues.forEach((issue) => {
-        if (issue.path[0]) {
-          newErrors[issue.path[0] as string] = "This field is required";
-        }
-      });
-      setErrors(newErrors);
-      return false;
-    }
+		if (!result.success) {
+			const newErrors: { [key: string]: string } = {};
+			result.error.issues.forEach((issue) => {
+				if (issue.path[0]) {
+					newErrors[issue.path[0] as string] = "This field is required";
+				}
+			});
+			setErrors(newErrors);
+			return false;
+		}
 
-    setErrors({});
-    return true;
-  };
+		setErrors({});
+		return true;
+	};
 
-  const handleGeneratePath = async () => {
-    if (isGenerating) return;
-    setIsGenerating(true);
-    setIsAnalyzing(true);
-    setAnalysisStep(1);
-    setGenerationError("");
-    setLearningPath(null);
+	const handleGeneratePath = async () => {
+		if (isGenerating) return;
 
+		setIsGenerating(true);
+		setIsAnalyzing(true);
+		setAnalysisStep(1);
+		setGenerationError("");
+		setLearningPath(null);
 
-    const apiPromise = fetch("/api/learning-path", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    }).then(async (res) => {
-      const result: { data?: LearningPathResponse; error?: string } = await res.json();
-      if (!res.ok || !result.data) {
-        throw new Error(result.error || "Failed to generate learning path");
-      }
+		const stepInterval = setInterval(() => {
+			setAnalysisStep((prev) => (prev < 5 ? prev + 1 : prev));
+		}, 1200);
 
-	  const pathInfo:PathInformation={
-		id:crypto.randomUUID(),
-		createdAt:new Date().toISOString(),
-		formData,
-		steps:result.data.steps
-	  }
+		try {
+			const response = await fetch("/api/learning-path", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(formData),
+			})
+			const result: { data?: LearningPathResponse; error?: string } = await response.json()
+			if (response.status==400){
+				setGenerationError(result.error || "Failed to generate your path, checko your data and try again.")
+				setStep(1)
+				return
+			}
+			if (!response.ok || !result.data) {
+				setGenerationError(result.error || "Failed to generate learning path.");
+				return
+			}
+			const pathInfo: PathInformation = {
+				id: crypto.randomUUID(),
+				createdAt: new Date().toISOString(),
+				formData,
+				steps: result.data.steps
+			}
 
-	  storePath(pathInfo)
+			storePath(pathInfo)
 
-      return result.data;
-    });
+			setAnalysisStep(5);
+			await new Promise((resolve) => setTimeout(resolve, 800));
+			setLearningPath(result.data);
+		} catch (err: any) {
+			setGenerationError(err?.message || "An unexpected error occurred, check your inputs and try again.");
+		} finally {
+			clearInterval(stepInterval);
+			setIsGenerating(false);
+			setIsAnalyzing(false);
+		}
+	}
 
-    const stepInterval = setInterval(() => {
-      setAnalysisStep((prev) => {
-        if (prev < 5) return prev + 1;
-        return prev;
-      });
-    }, 1200); 
+	const handleNext = () => {
+		if (!validateCurrentStep()) return;
 
-    try {
-      const data = await apiPromise;
-
-      setAnalysisStep(5);
-      await new Promise((resolve) => setTimeout(resolve, 800));
-
-      setLearningPath(data);
-    } catch (err) {
-      setGenerationError("An error occurred while generating the learning path.");
-    } finally {
-      clearInterval(stepInterval);
-      setIsGenerating(false);
-      setIsAnalyzing(false);
-    }
-  };
-
-  const handleNext = () => {
-    if (!validateCurrentStep()) return;
-
-    if (step < 4) {
-      setStep((s) => s + 1);
-      return;
-    }
-    void handleGeneratePath();
-  };
+		if (step < 4) {
+			setStep((s) => s + 1);
+			return;
+		}
+		void handleGeneratePath();
+	};
 	const handleAnalysisComplete = () => {
-		if (learningPath){
+		if (learningPath) {
 			router.replace("/learning-path");
 		}
 	}
-  if (isAnalyzing) {
-    return (
-      <AnalysisEngine
-        targetRole={formData.targetRole || "Target Role"}
-        analysisStep={analysisStep}
-		onComplete={handleAnalysisComplete}
-      />
-    );
-  }
+	if (isAnalyzing) {
+		return (
+			<AnalysisEngine
+				targetRole={formData.targetRole || "Target Role"}
+				analysisStep={analysisStep}
+				onComplete={handleAnalysisComplete}
+			/>
+		);
+	}
 
-  const curr = STEPS[step - 1];
-  const StepComp = curr.comp;
-  const StepIcon = curr.icon;
+	const curr = STEPS[step - 1];
+	const StepComp = curr.comp;
+	const StepIcon = curr.icon;
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-900 pb-20">
