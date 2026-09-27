@@ -150,7 +150,7 @@ export default function CareerProfilePage() {
       await new Promise((resolve) => setTimeout(resolve, 800));
 
       setLearningPath(data);
-    } catch (err) {
+    } catch {
       setGenerationError("An error occurred while generating the learning path.");
     } finally {
       clearInterval(stepInterval);

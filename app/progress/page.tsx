@@ -1,19 +1,17 @@
 'use client';
 
-import React, { useState,useEffect } from 'react';
+import React, { useState} from 'react';
 import { 
   ArrowLeft, 
   Clock, 
   ArrowRight 
 } from 'lucide-react';
 import Link from 'next/link';
-import { PathStep } from "@/schemas/learningPathSchemas";
 import {retrieveCurrentPath} from '@/lib/storage'
 import { PathInformation } from '@/schemas/learningPathSchemas';
 
 
 export default function CareerProgress() {
-  const [steps,setSteps] = useState<PathStep[]>([]);
   const [currentPath] = useState<PathInformation | null>(()=>{
 	if (typeof window=="undefined") return null
 	return retrieveCurrentPath()?? null
@@ -23,9 +21,8 @@ export default function CareerProgress() {
   const [completedCount, setCompletedCount] = useState<number>(0);
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(1);
 
+  const steps=currentPath?.steps??[]
   
-  setSteps(currentPath?.steps??[])
-
   if (isLoading) {
     return <div>Loading learning path...</div>;
   }

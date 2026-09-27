@@ -1,8 +1,8 @@
 "use client";
 
 import {retrieveCurrentPath} from '@/lib/storage'
-import React, { useState,useEffect } from "react";
-import { PathStep } from "@/schemas/learningPathSchemas";
+import React, { useState } from "react";
+import { storePath } from '@/lib/storage';
 import { PathInformation } from '@/schemas/learningPathSchemas';
 import {
   ChevronDown,
@@ -16,21 +16,19 @@ import Link from 'next/link';
 
 
 export default function LearningPath() {
-  const [steps,setSteps] = useState<PathStep[]>([]);
-  const [currentPath] = useState<PathInformation | null>(()=>{
+  const [currentPath,setCurrentPath] = useState<PathInformation | null>(()=>{
 	if (typeof window=="undefined") return null
 	return retrieveCurrentPath()?? null
   });
-  const [isLoading,setIsLoading] = useState(true)
   const [expandedSteps, setExpandedSteps] = useState<Record<number, boolean>>({
 	1: true,
   });
 
-  setSteps(currentPath?.steps??[])
+  const steps=currentPath?.steps??[]
 
-   if (isLoading) {
-    return <div>Loading learning path...</div>;
-  }
+//    if (isLoading) {
+//     return <div>Loading learning path...</div>;
+//   }
 
   if (!steps.length) {
     return <div>No learning path found. Please generate one first.</div>;
@@ -48,9 +46,17 @@ export default function LearningPath() {
 
   const toggleComplete = (position: number, e: React.MouseEvent) => {
     e.stopPropagation();
-    setSteps((prev) =>
-      prev.map((step) => (step.position === position ? { ...step, completed: !step.completed } : step))
-    );
+	if (!currentPath) return null
+
+	const updatedSteps = currentPath.steps.map((step)=>
+		step.position===position
+		? {...step ,completed:!step.completed}
+		:step
+	)
+	const updatedPath={...currentPath,steps:updatedSteps}
+    
+	setCurrentPath(updatedPath)
+	storePath(updatedPath)
   };
 
 
