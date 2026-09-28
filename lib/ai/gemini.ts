@@ -35,8 +35,16 @@ export default async function queryAi(query: string): Promise<string> {
       }
 
       return res.output_text;
-    } catch (error: any) {
-      const status = error?.status || error?.response?.status;
+    } catch (error) {
+		const errorObject = error as {
+			status?: number;
+			response?: {
+				status?: number;
+			};
+		};
+      const status = 
+	    errorObject?.status ??
+		errorObject?.response?.status
       if (status === 429 || status === 401 || status === 403) {
         console.warn(`[${model}] Direct failure with status ${status}. Skipping to fallback...`);
       }
@@ -48,14 +56,13 @@ export default async function queryAi(query: string): Promise<string> {
 
 	try {
 		return await fetchModel(PRIMARY_MODEL);
-	} catch (primaryError: any) {
-		console.warn(`Primary model (${PRIMARY_MODEL}) failed`,primaryError?.message || primaryError)
+	} catch  {
+		console.warn(`Primary model (${PRIMARY_MODEL}) failed`)
 
 		try {
 			return await fetchModel(SECONDARY_MODEL);
-		} catch (fallbackError: any) {
-			console.error(`Fallback model (${SECONDARY_MODEL}) failed`,fallbackError?.error || fallbackError)
-
+		} catch  {
+			console.error(`Fallback model (${SECONDARY_MODEL}) failed`)
 			throw new Error('Our AI service is temporarily unavailable. Please try again in a few moments.');
 		}
 	}

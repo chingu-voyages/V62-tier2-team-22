@@ -144,8 +144,9 @@ export default function CareerProfilePage() {
 			setAnalysisStep(5);
 			await new Promise((resolve) => setTimeout(resolve, 800));
 			setLearningPath(result.data);
-		} catch (err: any) {
-			setGenerationError(err?.message || "An unexpected error occurred, check your inputs and try again.");
+		} catch (err) {
+			const errorMessage=err instanceof Error ? err.message : "An unexpected error occurred, check your inputs and try again."
+			setGenerationError(errorMessage);
 		} finally {
 			clearInterval(stepInterval);
 			setIsGenerating(false);

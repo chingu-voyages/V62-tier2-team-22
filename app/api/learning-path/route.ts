@@ -21,9 +21,10 @@ export async function POST(request: Request) {
     let aiResponse: string;
     try {
       aiResponse = await queryAi(prompt);
-    } catch (e: any) {
+    } catch (e) {
+	  const errorMessage=e instanceof Error ? e.message : "AI service unavailable. Please try again later."
       return NextResponse.json(
-        { error: e?.message || "AI service unavailable. Please try again later." },
+        { error: errorMessage},
         { status: 503 }
       );
     }
@@ -31,7 +32,7 @@ export async function POST(request: Request) {
     let parsedResponse: unknown;
     try {
       parsedResponse = JSON.parse(aiResponse);
-    } catch (e) {
+    } catch  {
       return NextResponse.json(
         { error: "An error occured while generating the path." },
         { status: 502 }
@@ -51,7 +52,7 @@ export async function POST(request: Request) {
       message: "Learning path generated successfully",
       data: resResult.data,
     });
-  } catch (e: any) {
+  } catch{
     return NextResponse.json(
       { error:"An unexpected error occurred" },
       { status: 500 }
