@@ -1,47 +1,61 @@
-import {NextResponse} from "next/server";
-import {learningPathRequestSchemas} from "@/schemas/formSchemas";
+import { NextResponse } from "next/server";
+import { learningPathRequestSchemas } from "@/schemas/formSchemas";
 import queryAi from "@/lib/ai/gemini";
-import { buildLearningPathPrompt} from "@/lib/ai/learning-path";
-import {learningPathResponseSchema} from "@/schemas/learningPathSchemas";
+import { buildLearningPathPrompt } from "@/lib/ai/learning-path";
+import { learningPathResponseSchema } from "@/schemas/learningPathSchemas";
 
 
 
 export async function POST(request: Request) {
+  try {
     const body = await request.json();
-    const result = learningPathRequestSchemas.safeParse(body);
+	const parsed=learningPathRequestSchemas.safeParse(body)
 
-    if (!result.success) {
-        return NextResponse.json(
-            { error: "Invalid career information" },
-            { status: 400 }
-        );
+	if(!parsed.success){
+		return NextResponse.json(
+			{error:"An error occured while parsing the form."},
+			{status:400}
+		)
+	}
+	const prompt=buildLearningPathPrompt(parsed.data)
+    let aiResponse: string;
+    try {
+      aiResponse = await queryAi(prompt);
+    } catch (e) {
+	  const errorMessage=e instanceof Error ? e.message : "AI service unavailable. Please try again later."
+      return NextResponse.json(
+        { error: errorMessage},
+        { status: 503 }
+      );
     }
-        const prompt = buildLearningPathPrompt(result.data);
-        const aiResponse = await queryAi(prompt);
 
-        let parsedResponse: unknown;
+    let parsedResponse: unknown;
+    try {
+      parsedResponse = JSON.parse(aiResponse);
+    } catch  {
+      return NextResponse.json(
+        { error: "An error occured while generating the path." },
+        { status: 502 }
+      );
+    }
 
-        try {
-            parsedResponse = JSON.parse(aiResponse);
-        }catch  {
-            return NextResponse.json(
-                {error: "Invalid JSON response from AI"},
-                { status: 502 }
-            )
-        }
+    const resResult = learningPathResponseSchema.safeParse(parsedResponse);
 
-        const resResult = learningPathResponseSchema.safeParse(parsedResponse);
-       
-        if (!resResult.success) {
-            return NextResponse.json(
-                {error: "Invalid response format from AI"},
-                { status: 502 }
-            )
-        }
+    if (!resResult.success) {
+      return NextResponse.json(
+        { error: "An error occured while generating the path, ensure your target role is valid." },
+        { status: 400 }
+      );
+    }
 
-        return NextResponse.json({
-            message: "Learning path generated successfully",
-            data: resResult.data,
-        })
-
+    return NextResponse.json({
+      message: "Learning path generated successfully",
+      data: resResult.data,
+    });
+  } catch{
+    return NextResponse.json(
+      { error:"An unexpected error occurred" },
+      { status: 500 }
+    );
+  }
 }
