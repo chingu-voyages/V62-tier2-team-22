@@ -56,7 +56,7 @@ export default function LearningPath() {
 	const updatedPath={...currentPath,steps:updatedSteps}
     
 	setCurrentPath(updatedPath)
-	storePath(updatedPath)
+	storePath(updatedPath,true)
   };
 
 

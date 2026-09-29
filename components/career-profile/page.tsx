@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import StepGoal from "@/components/career-profile/StepGoal";
 import StepLevel from "@/components/career-profile/StepLevel";
 import StepBackground from "@/components/career-profile/StepBackground";
+import { useSearchParams } from "next/navigation";
 import StepCommitment from "@/components/career-profile/StepCommitment";
 import AnalysisEngine from "@/components/career-profile/AnalysisEngine";
 import { learningPathRequest, learningPathRequestSchemas } from "../../schemas/formSchemas";
@@ -23,6 +24,7 @@ const STEPS = [
 
 export default function CareerProfilePage() {
 	const router = useRouter();
+	const searchParams=useSearchParams()
 	const [step, setStep] = useState(1);
 	const [errors, setErrors] = useState<{ [key: string]: string }>({});
 	const [isGenerating, setIsGenerating] = useState(false);
@@ -139,7 +141,8 @@ export default function CareerProfilePage() {
 				steps: result.data.steps
 			}
 
-			storePath(pathInfo)
+			const deleteCurrent=searchParams.get('deleteCurrent') === 'true'
+			storePath(pathInfo,deleteCurrent)
 
 			setAnalysisStep(5);
 			await new Promise((resolve) => setTimeout(resolve, 800));

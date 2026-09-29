@@ -41,6 +41,16 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
     return () => window.removeEventListener("keydown", handleEscape);
     }, [showStartOverConfirm]);
 
+  const currentPath=retrieveCurrentPath()
+  let deleteCurrent: boolean = false
+  if (Boolean(currentPath)){
+	for (let i = 0; i < currentPath!.steps.length; i++) {
+	  if (!currentPath!.steps[i].completed){
+		deleteCurrent=true
+		break
+	  }
+	}
+  }
 
 
   return (
@@ -124,8 +134,7 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
                 type="button"
                 onClick={() => {
                   setShowStartOverConfirm(false);
-                  router.push("/career");
-
+                  router.push(`/career?deleteCurrent=${deleteCurrent}`);
                 }}
                 className="rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-black"
                 >
