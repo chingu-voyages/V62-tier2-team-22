@@ -1,12 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { use } from "react";
 import Link from "next/link";
 import { AuthStatus } from "../Authentication/AuthButton";
 import { usePathname } from "next/navigation";
 import {useSyncExternalStore} from 'react'
 import {retrieveCurrentPath} from '@/lib/storage'
-import {useState} from 'react'
+import {useState, useEffect} from 'react'
 import {useRouter} from 'next/navigation'
 
 
@@ -28,6 +28,18 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
   const hasPath = useSyncExternalStore(subscribeToStorage, hasCurrentPath, () => false);
   const [showStartOverConfirm, setShowStartOverConfirm] = useState(false);
   const router = useRouter();
+  useEffect(() => {
+    if (!showStartOverConfirm) return;
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setShowStartOverConfirm(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+    }, [showStartOverConfirm]);
 
 
 
@@ -79,7 +91,14 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
     </header>
     {
       pathname === "/learning-path" && showStartOverConfirm && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+          <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) {
+              setShowStartOverConfirm(false);
+            } 
+          }}>
+
             <div
             role="dialog"
             aria-modal="true"
