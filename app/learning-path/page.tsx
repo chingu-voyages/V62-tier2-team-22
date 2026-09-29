@@ -1,8 +1,7 @@
 "use client";
 
 import {retrieveCurrentPath} from '@/lib/storage'
-import React, { useState } from "react";
-import { storePath } from '@/lib/storage';
+import React, { useEffect, useState } from "react";
 import { PathInformation } from '@/schemas/learningPathSchemas';
 import {
   ChevronDown,
@@ -13,19 +12,24 @@ import {
   Clock,
 } from "lucide-react";
 import Link from 'next/link';
+import { updatePath } from '../actions/path-actions';
 
 
 export default function LearningPath() {
-  const [currentPath,setCurrentPath] = useState<PathInformation | null>(()=>{
-	if (typeof window=="undefined") return null
-	return retrieveCurrentPath()?? null
-  });
+  const [currentPath,setCurrentPath] = useState<PathInformation | null>(null)
   const [expandedSteps, setExpandedSteps] = useState<Record<number, boolean>>({
 	1: true,
   });
 
   const steps=currentPath?.steps??[]
 
+  useEffect(()=>{
+	async function fetchPath(){
+		const path=await retrieveCurrentPath()
+		setCurrentPath(path??null)
+	}
+	fetchPath()
+  },[])
 //    if (isLoading) {
 //     return <div>Loading learning path...</div>;
 //   }
@@ -56,7 +60,7 @@ export default function LearningPath() {
 	const updatedPath={...currentPath,steps:updatedSteps}
     
 	setCurrentPath(updatedPath)
-	storePath(updatedPath,true)
+	updatePath(updatedPath)
   };
 
 

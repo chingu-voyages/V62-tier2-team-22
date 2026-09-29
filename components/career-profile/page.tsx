@@ -10,7 +10,7 @@ import AnalysisEngine from "@/components/career-profile/AnalysisEngine";
 import { learningPathRequest, learningPathRequestSchemas } from "../../schemas/formSchemas";
 import { Check, Compass, Layers, BookOpen, Target } from "lucide-react";
 import type { LearningPathResponse, PathInformation } from "@/schemas/learningPathSchemas";
-import { storePath } from "@/lib/storage";
+import { storeCurrentPath } from "@/lib/storage";
 import { useRouter } from 'next/navigation'
 
 type FieldValue = string | string[] | number | undefined;
@@ -142,7 +142,7 @@ export default function CareerProfilePage() {
 			}
 
 			const deleteCurrent=searchParams.get('deleteCurrent') === 'true'
-			storePath(pathInfo,deleteCurrent)
+			await storeCurrentPath(pathInfo,deleteCurrent)
 
 			setAnalysisStep(5);
 			await new Promise((resolve) => setTimeout(resolve, 800));

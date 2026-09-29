@@ -5,9 +5,10 @@ import Link from "next/link";
 import { AuthStatus } from "../Authentication/AuthButton";
 import { usePathname } from "next/navigation";
 import {useSyncExternalStore} from 'react'
-import {retrieveCurrentPath} from '@/lib/storage'
+import {CURRENT_PATH_ID, retrieveCurrentPath} from '@/lib/storage'
 import {useState, useEffect} from 'react'
 import {useRouter} from 'next/navigation'
+import { PathInformation } from "@/schemas/learningPathSchemas";
 
 
 interface NavbarProps {
@@ -20,11 +21,13 @@ function subscribeToStorage(callback: () => void) {
     window.removeEventListener("storage", callback);
   }}
 function hasCurrentPath() {
-    return Boolean(retrieveCurrentPath());
+	if (typeof window == "undefined") return false
+    return Boolean(localStorage.getItem(CURRENT_PATH_ID));
   }
 
 export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
   const pathname = usePathname();
+  const [currentPath,setCurrentPath]=useState<PathInformation | null>(null)
   const hasPath = useSyncExternalStore(subscribeToStorage, hasCurrentPath, () => false);
   const [showStartOverConfirm, setShowStartOverConfirm] = useState(false);
   const router = useRouter();
@@ -41,7 +44,15 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
     return () => window.removeEventListener("keydown", handleEscape);
     }, [showStartOverConfirm]);
 
-  const currentPath=retrieveCurrentPath()
+  useEffect(()=>{
+	async function fetchPath(){
+	  const path=await retrieveCurrentPath()
+	  setCurrentPath(path??null)
+	}
+	fetchPath()
+  },[])
+
+
   let deleteCurrent: boolean = false
   if (Boolean(currentPath)){
 	for (let i = 0; i < currentPath!.steps.length; i++) {
