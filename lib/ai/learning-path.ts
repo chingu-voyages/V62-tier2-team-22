@@ -40,7 +40,13 @@ Return only valid JSON in this format:
       "title": "Step title",
       "description": "What the learner should learn or accomplish in this step",
       "whyItMatters": "Why this step is important for achieving the career goal",
-      "estimatedTime": "Estimated completion time"
+      "estimatedTime": "Estimated completion time",
+      "resources": [{
+        "title": "Resource title",
+        "type": "documentation",
+        "url": "https://example.com/resource",
+        "isFree": true
+      }]
     }
   ]
 }
@@ -59,6 +65,20 @@ Requirements:
 - Make sure the combined time estimates fit within the learner's target timeframe.
 - Personalize every step using all provided learner information.
 - Do not include Markdown or text outside the JSON.
+- Suggest 3 to 5 relevant learning resources per step when suitable resources are known, so alternatives are available if some links fail verification.
+- Match resources to the step's main learning outcome and the learner's current level.
+- Each resource must include a specific title, type, direct HTTPS URL, and isFree.
+- Resource type must be course, article, video, or documentation.
+- Prefer free resources. Include paid resources only when useful, and set isFree to false.
+- Include a mix of courses, videos, articles, and documentation where appropriate.
+- Do not rely only on documentation when suitable free courses or videos are known.
+- Prioritize relevance and quality over quantity.
+- Do not invent resources or URLs, or use placeholder links such as example.com, to reach the requested number.
+- If no suitable resources are known for a step, return an empty resources array.
+- Classify a resource as "course" only if it provides a structured sequence of lessons.
+- Do not classify games, standalone exercises, or tools as courses.
+- Only recommend resources that accurately fit the supported types: course, article, video, or documentation.
+- Prefer structured courses or video lessons when suitable options are known.
 `.trim();
 }
 
