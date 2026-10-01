@@ -69,10 +69,10 @@ Requirements:
 - Match resources to the step's main learning outcome and the learner's current level.
 - Each resource must include a specific title, type, direct HTTPS URL, and isFree.
 - Resource type must be course, article, video, or documentation.
-- Prefer free resources. Include paid resources only when useful, and set isFree to false.
-- Include a mix of courses, videos, articles, and documentation where appropriate.
-- Do not rely only on documentation when suitable free courses or videos are known.
-- Prioritize relevance and quality over quantity.
+- Include a mix of free and paid resources when suitable options are known.
+- Set isFree to true for free resources and false for resources that require payment to access the recommended content.
+- Do not label a paid course as free just because it offers a free preview.- Include a mix of courses, videos, articles, and documentation where appropriate.
+- Do not rely only on documentation when suitable courses or videos are known.- Prioritize relevance and quality over quantity.
 - Do not invent resources or URLs, or use placeholder links such as example.com, to reach the requested number.
 - If no suitable resources are known for a step, return an empty resources array.
 - Classify a resource as "course" only if it provides a structured sequence of lessons.
