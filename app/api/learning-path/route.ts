@@ -67,14 +67,15 @@ export async function POST(request: Request) {
           })
         );
 
-        return {
+          return {
           ...step,
           resources: checkedResources
-  .filter((resource) => resource !== null)
-  .filter((resource, index, resources) => {
-    resources.findIndex((r) => r?.url === resource?.url) === index;
-  })
-  .slice(0, 3),
+            .filter((resource) => resource !== null)
+            .filter(
+              (resource, index, resources) =>
+                resources.findIndex((r) => r.url === resource.url) === index
+            )
+            .slice(0, 3),
         };
       })
     );
