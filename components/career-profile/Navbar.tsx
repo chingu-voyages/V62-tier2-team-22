@@ -32,7 +32,7 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
   const pathname = usePathname();
   const getSnapshot= useCallback(()=>{
 	if (typeof window === "undefined") return false
-	return Boolean(localStorage.getItem(getCurrentPathKey()))
+	return Boolean(localStorage.getItem(getCurrentPathKey(userId)))
   },[userId])
   const [currentPath,setCurrentPath]=useState<PathInformation | null>(null)
   const hasPath = useSyncExternalStore(subscribeToStorage, getSnapshot, () => false);
