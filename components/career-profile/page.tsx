@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import StepGoal from "@/components/career-profile/StepGoal";
 import StepLevel from "@/components/career-profile/StepLevel";
+import { useSession } from "next-auth/react";
 import StepBackground from "@/components/career-profile/StepBackground";
 import { useSearchParams } from "next/navigation";
 import StepCommitment from "@/components/career-profile/StepCommitment";
@@ -12,6 +13,7 @@ import { Check, Compass, Layers, BookOpen, Target } from "lucide-react";
 import type { LearningPathResponse, PathInformation } from "@/schemas/learningPathSchemas";
 import { storeCurrentPath } from "@/lib/storage";
 import { useRouter } from 'next/navigation'
+import { createPath } from "@/app/actions/path-actions";
 
 type FieldValue = string | string[] | number | undefined;
 
@@ -23,6 +25,8 @@ const STEPS = [
 ];
 
 export default function CareerProfilePage() {
+	const {data:session} =useSession()
+	const userId=session?.user?.id || null
 	const router = useRouter();
 	const searchParams=useSearchParams()
 	const [step, setStep] = useState(1);
@@ -142,7 +146,8 @@ export default function CareerProfilePage() {
 			}
 
 			const deleteCurrent=searchParams.get('deleteCurrent') === 'true'
-			await storeCurrentPath(pathInfo,deleteCurrent)
+			await storeCurrentPath(pathInfo,userId,deleteCurrent)
+			await createPath(pathInfo)
 
 			setAnalysisStep(5);
 			await new Promise((resolve) => setTimeout(resolve, 800));

@@ -1,34 +1,41 @@
 "use client";
 
-import React, { use } from "react";
+import React, { use, useCallback } from "react";
 import Link from "next/link";
 import { AuthStatus } from "../Authentication/AuthButton";
 import { usePathname } from "next/navigation";
 import {useSyncExternalStore} from 'react'
-import {CURRENT_PATH_ID, retrieveCurrentPath} from '@/lib/storage'
+import {getCurrentPathKey, retrieveCurrentPath} from '@/lib/storage'
 import {useState, useEffect} from 'react'
 import {useRouter} from 'next/navigation'
 import { PathInformation } from "@/schemas/learningPathSchemas";
+import { useSession } from "next-auth/react";
 
 
 interface NavbarProps {
   appName?: string;
 }
 
+
+
 function subscribeToStorage(callback: () => void) {
   window.addEventListener("storage", callback);
   return () => {
     window.removeEventListener("storage", callback);
   }}
-function hasCurrentPath() {
-	if (typeof window == "undefined") return false
-    return Boolean(localStorage.getItem(CURRENT_PATH_ID));
-  }
+
+
 
 export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
+  const { data: session } = useSession()
+  const userId = session?.user?.id || null
   const pathname = usePathname();
+  const getSnapshot= useCallback(()=>{
+	if (typeof window === "undefined") return false
+	return Boolean(localStorage.getItem(getCurrentPathKey()))
+  },[userId])
   const [currentPath,setCurrentPath]=useState<PathInformation | null>(null)
-  const hasPath = useSyncExternalStore(subscribeToStorage, hasCurrentPath, () => false);
+  const hasPath = useSyncExternalStore(subscribeToStorage, getSnapshot, () => false);
   const [showStartOverConfirm, setShowStartOverConfirm] = useState(false);
   const router = useRouter();
   useEffect(() => {
@@ -46,7 +53,7 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
 
   useEffect(()=>{
 	async function fetchPath(){
-	  const path=await retrieveCurrentPath()
+	  const path=await retrieveCurrentPath(userId)
 	  setCurrentPath(path??null)
 	}
 	fetchPath()
