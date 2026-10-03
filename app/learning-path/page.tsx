@@ -319,6 +319,41 @@ export default function LearningPath() {
 						  <p className="text-sm text-slate-600 leading-relaxed pb-4 md:pb-0">
 							{step.description}
 						  </p>
+              <div className="pt-4">
+  <h4 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+    Learning resources
+  </h4>
+
+  {step.resources?.length ? (
+    <ul className="mt-3 space-y-2">
+      {step.resources.map((resource) => (
+        <li key={resource.url}>
+          <a
+            href={resource.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block rounded-lg border border-slate-200 p-3 transition hover:border-sky-400 focus-visible:outline-2 focus-visible:outline-sky-500"
+          >
+            <span className="text-sm font-semibold text-sky-700">
+              {resource.title}
+            </span>
+
+            <span className="mt-1 flex items-center gap-2 text-xs text-slate-500">
+              <span className="capitalize">{resource.type}</span>
+              <span>·</span>
+              <span>{resource.isFree ? "Free" : "Paid"}</span>
+              <span>· Opens in a new tab</span>
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p className="mt-2 text-sm text-slate-500">
+      No learning resources are available for this step right now.
+    </p>
+  )}
+</div>
                         </div>
 
                         <div className="space-y-3 flex flex-col justify-between md:pl-6">
