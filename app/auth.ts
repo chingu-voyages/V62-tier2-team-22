@@ -22,15 +22,22 @@ export const {handlers, signIn,signOut,auth}=NextAuth({
 		strategy:'jwt'
 	},
 	callbacks:{
-		async jwt({token,user}){
-			if (user){
-				token.sub=user.id || token.sub
-			}
+		async jwt({token,account,profile}){
+			if (profile){
+				const providerUserId=profile.sub || (profile.id ? String(profile.id) : null)
+				if(providerUserId){
+					token.userId=providerUserId
+				}
+			}	
+
+			if (!token.userId && token.sub)
+				token.userId=token.sub
+
 			return token
 		},
 		async session({session,token}){
-			if(session.user && token.sub){
-				session.user.id=token.sub
+			if(session.user && token.userId){
+				session.user.id= token.userId as string
 			}
 			return session
 		}
