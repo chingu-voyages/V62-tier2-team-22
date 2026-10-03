@@ -43,7 +43,7 @@ export async function POST(request: Request) {
 
     if (!resResult.success) {
       return NextResponse.json(
-        { error: "An error occured while generating the path, ensure your target role is valid." },
+        { error: "Sorry, we couldn't generate your path, ensure your target role is valid." },
         { status: 400 }
       );
     }
