@@ -6,9 +6,7 @@ import { prisma } from "@/lib/prisma"
 import { PathInformation } from "@/schemas/learningPathSchemas"
 
 export async function createPath(path:PathInformation){
-	console.log(process.env.DATABASE_URL)
 	const session = await auth()
-	console.log("SESSION OBJECT:", JSON.stringify(session, null, 2));
 
 	if (!session?.user?.id){
 		console.log("ABORTED: No session.user.id found!");
@@ -65,9 +63,19 @@ export async function updatePath(path:PathInformation){
 		return
 	}
 
-	const updated= await prisma.learningPath.update({
-		where:{id:path.id},
-		data:{
+	await prisma.learningPath.upsert({
+		where:{
+			id:path.id,
+			userId:session.user.id
+		},
+		update:{
+			steps:path.steps as unknown as Prisma.InputJsonObject
+		},
+		create:{
+			id:path.id,
+			userId:session.user.id,
+			createdAt:path.createdAt,
+			formData:path.formData,
 			steps:path.steps as unknown as Prisma.InputJsonObject
 		}
 	})
@@ -81,6 +89,9 @@ export async function deletePath(pathId:string){
 	}
 
 	await prisma.learningPath.delete({
-		where:{id:pathId}
+		where:{
+			id:pathId,
+			userId:session.user.id
+		}
 	})
 }
