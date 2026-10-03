@@ -26,8 +26,6 @@ export default function LearningPath() {
   const {data:session,status} = useSession()
   const userId=session?.user?.id || null
 
-  console.log(session?.user?.id,'react')
-
   useEffect(()=>{
 	if (status==="loading") return
 	async function fetchPath(){
