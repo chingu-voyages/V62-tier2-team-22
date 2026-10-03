@@ -1,31 +1,41 @@
 "use client";
 
-import React, { use } from "react";
+import React, { use, useCallback } from "react";
 import Link from "next/link";
 import { AuthStatus } from "../Authentication/AuthButton";
 import { usePathname } from "next/navigation";
 import {useSyncExternalStore} from 'react'
-import {retrieveCurrentPath} from '@/lib/storage'
+import {getCurrentPathKey, retrieveCurrentPath} from '@/lib/storage'
 import {useState, useEffect} from 'react'
 import {useRouter} from 'next/navigation'
+import { PathInformation } from "@/schemas/learningPathSchemas";
+import { useSession } from "next-auth/react";
 
 
 interface NavbarProps {
   appName?: string;
 }
 
+
+
 function subscribeToStorage(callback: () => void) {
   window.addEventListener("storage", callback);
   return () => {
     window.removeEventListener("storage", callback);
   }}
-function hasCurrentPath() {
-    return Boolean(retrieveCurrentPath());
-  }
+
+
 
 export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
+  const { data: session } = useSession()
+  const userId = session?.user?.id || null
   const pathname = usePathname();
-  const hasPath = useSyncExternalStore(subscribeToStorage, hasCurrentPath, () => false);
+  const getSnapshot= useCallback(()=>{
+	if (typeof window === "undefined") return false
+	return Boolean(localStorage.getItem(getCurrentPathKey(userId)))
+  },[userId])
+  const [currentPath,setCurrentPath]=useState<PathInformation | null>(null)
+  const hasPath = useSyncExternalStore(subscribeToStorage, getSnapshot, () => false);
   const [showStartOverConfirm, setShowStartOverConfirm] = useState(false);
   const router = useRouter();
   useEffect(() => {
@@ -41,6 +51,24 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
     return () => window.removeEventListener("keydown", handleEscape);
     }, [showStartOverConfirm]);
 
+  useEffect(()=>{
+	async function fetchPath(){
+	  const path=await retrieveCurrentPath(userId)
+	  setCurrentPath(path??null)
+	}
+	fetchPath()
+  },[])
+
+
+  let deleteCurrent: boolean = false
+  if (Boolean(currentPath)){
+	for (let i = 0; i < currentPath!.steps.length; i++) {
+	  if (!currentPath!.steps[i].completed){
+		deleteCurrent=true
+		break
+	  }
+	}
+  }
 
 
   return (
@@ -124,8 +152,7 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
                 type="button"
                 onClick={() => {
                   setShowStartOverConfirm(false);
-                  router.push("/career");
-
+                  router.push(`/career?deleteCurrent=${deleteCurrent}`);
                 }}
                 className="rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-black"
                 >

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState} from 'react';
+import React, { useEffect, useState} from 'react';
 import { 
   ArrowLeft, 
   Clock, 
@@ -9,21 +9,42 @@ import {
 import Link from 'next/link';
 import {retrieveCurrentPath} from '@/lib/storage'
 import { PathInformation } from '@/schemas/learningPathSchemas';
+import { useSession } from 'next-auth/react';
 
 
 export default function CareerProgress() {
-  const [currentPath] = useState<PathInformation | null>(()=>{
-	if (typeof window=="undefined") return null
-	return retrieveCurrentPath()?? null
-  });
+  const {data:session,status}=useSession()
+  const [currentPath,setCurrentPath] = useState<PathInformation | null>(null)
   const [isLoading,setIsLoading] = useState(true)
   const [completionPercentage, setCompletionPercentage] = useState<number>(0);
   const [completedCount, setCompletedCount] = useState<number>(0);
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(1);
 
-  const steps=currentPath?.steps??[]
+  const userId=session?.user?.id || null
   
-  if (isLoading) {
+  useEffect(()=>{
+	if (status==="loading") return
+
+	async function fetchPath(){
+		try{
+			setIsLoading(true)
+			const path = await retrieveCurrentPath(userId)
+			setCurrentPath(path??null)
+		}
+		catch(e){
+			console.error('failed to retrieve path',e)
+		}
+		finally{
+			setIsLoading(false)
+		}
+	}
+
+	fetchPath()
+  },[userId,status])
+
+  const steps=currentPath?.steps??[]
+
+  if (isLoading || status==="loading") {
     return <div>Loading learning path...</div>;
   }
 

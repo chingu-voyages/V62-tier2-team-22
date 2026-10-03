@@ -1,48 +1,97 @@
-import { PathInformation } from "@/schemas/learningPathSchemas";
+import { PathInformation, PathStep } from "@/schemas/learningPathSchemas";
+import * as DatabaseUtils from '@/app/actions/path-actions'
+import { learningPathRequest } from "@/schemas/formSchemas";
 
 
-export const STORAGE_KEY="storedPaths"
-export const CURRENT_PATH_ID="currentPathId"
+export function getStorageKey(userId?:string | null):string{
+	if (!userId){
+		return 'guest_learning_paths'
+	}
+	return `${userId}_learning_paths`
+}
 
-export function storePath(path:PathInformation){
+export function getCurrentPathKey(userId?:string | null):string{
+	if (!userId){
+		return 'guest_current_path'
+	}
+	return `${userId}_current_path`
+}
+
+export async function storeCurrentPath(path:PathInformation, userId:string|null, deletePrevious:boolean){
 	if (typeof window == "undefined") return
 
 	try{
-		const pathStorage = localStorage.getItem(STORAGE_KEY)
+		const storageKey=getStorageKey(userId)
+		const currentPathKey=getCurrentPathKey(userId)
+		const pathStorage = localStorage.getItem(storageKey)
 		const pathDictionary:Record<string,PathInformation> =pathStorage?JSON.parse(pathStorage):{}
 
+		if (deletePrevious){
+			const currentPathId=localStorage.getItem(currentPathKey)
+			if (currentPathId && pathDictionary[currentPathId])
+				delete pathDictionary[currentPathId]
+				await DatabaseUtils.deletePath(path.id).catch(console.error)
+		}
 		pathDictionary[path.id]=path
 
-		localStorage.setItem(STORAGE_KEY,JSON.stringify(pathDictionary))
-		localStorage.setItem(CURRENT_PATH_ID,path.id)
-	
+		localStorage.setItem(storageKey,JSON.stringify(pathDictionary))
+		localStorage.setItem(currentPathKey,path.id)
 	}
 	catch(e){
-		console.error("failed to store path in local storage",e)
+		console.error("failed to store path",e)
 	}
 }
 
 
-export function retrieveCurrentPath(){
+export async function retrieveCurrentPath(userId:string|null):Promise<PathInformation | null >{
 	if (typeof window =="undefined")
-		return
+		return null
 
 	try{
-		const storedId=localStorage.getItem(CURRENT_PATH_ID)
-		if (storedId==null){
-			return
+		const storageKey=getStorageKey(userId)
+		const currentPathKey=getCurrentPathKey(userId)
+		let storedPaths:Record<string,PathInformation> ={}
+		let currentPathId=localStorage.getItem(currentPathKey)
+		if (currentPathId==null){
+			if (!userId)
+				return null
+
+			const paths=await DatabaseUtils.retrieveAllPaths()
+
+			if (paths.length==0)
+				return null
+
+			paths.forEach((path,_)=>{
+				if (_==0){
+					currentPathId=path.id
+				}
+				storedPaths[path.id]={
+					id:path.id,
+					createdAt:path.createdAt.toISOString(),
+					formData:path.formData as unknown as learningPathRequest,
+					steps:path.steps as unknown as PathStep[]
+				}
+			})
+
+			if (currentPathId)
+				localStorage.setItem(currentPathKey,currentPathId)
+				
+			localStorage.setItem(storageKey,JSON.stringify(storedPaths))
+
+			return currentPathId? storedPaths[currentPathId] : null
 		}		
 
-		const paths=localStorage.getItem(STORAGE_KEY)
-		const pathDictionary:Record<string,PathInformation> =paths?JSON.parse(paths):{}
+		const paths=localStorage.getItem(storageKey)
+		storedPaths=paths?JSON.parse(paths):{}
 
-		if (!Object.hasOwn(pathDictionary,storedId)){
-			return
+		if (!Object.hasOwn(storedPaths,currentPathId)){
+			return null
 		}
 
-		return pathDictionary[storedId]
+		return storedPaths[currentPathId]
 	}
-	catch{
-		return
+	catch (e){
+		console.error('failed to retrieve paths.',e)
+		return null
 	}
 }

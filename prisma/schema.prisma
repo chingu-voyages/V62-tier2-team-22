@@ -12,3 +12,12 @@ datasource db {
   provider = "postgresql"
 }
 
+model LearningPath {
+	id String @id
+	userId String
+	createdAt DateTime @default(now())
+	formData Json
+	steps Json
+
+	@@index([userId])
+}
