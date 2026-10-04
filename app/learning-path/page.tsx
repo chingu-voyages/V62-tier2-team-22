@@ -1,9 +1,9 @@
 "use client";
 
-import {retrieveCurrentPath} from '@/lib/storage'
-import React, { useState } from "react";
-import { storePath } from '@/lib/storage';
+import {storeCurrentPath,retrieveCurrentPath} from '@/lib/storage'
+import React, { useEffect, useState } from "react";
 import { PathInformation } from '@/schemas/learningPathSchemas';
+import { useSession } from 'next-auth/react';
 import {
   ChevronDown,
   ChevronUp,
@@ -13,22 +13,40 @@ import {
   Clock,
 } from "lucide-react";
 import Link from 'next/link';
+import { updatePath } from '../actions/path-actions';
 
 
 export default function LearningPath() {
-  const [currentPath,setCurrentPath] = useState<PathInformation | null>(()=>{
-	if (typeof window=="undefined") return null
-	return retrieveCurrentPath()?? null
-  });
+  const [currentPath,setCurrentPath] = useState<PathInformation | null>(null)
+  const [isLoading,setIsLoading] = useState(true)
   const [expandedSteps, setExpandedSteps] = useState<Record<number, boolean>>({
 	1: true,
   });
-
   const steps=currentPath?.steps??[]
+  const {data:session,status} = useSession()
+  const userId=session?.user?.id || null
 
-//    if (isLoading) {
-//     return <div>Loading learning path...</div>;
-//   }
+  useEffect(()=>{
+	if (status==="loading") return
+	async function fetchPath(){
+		try{
+			setIsLoading(true)
+			const path = await retrieveCurrentPath(userId)
+			setCurrentPath(path ?? null)
+		}
+		catch(error){
+			console.error('failed to fetch path',error)
+		}
+		finally{
+			setIsLoading(false)
+		}
+	}
+	fetchPath()
+  },[userId,status])
+
+  if (isLoading || status==="loading") {
+    return <div>Loading learning path...</div>;
+  }
 
   if (!steps.length) {
     return <div>No learning path found. Please generate one first.</div>;
@@ -44,7 +62,7 @@ export default function LearningPath() {
     }));
   };
 
-  const toggleComplete = (position: number, e: React.MouseEvent) => {
+  const toggleComplete = async (position: number, e: React.MouseEvent) => {
     e.stopPropagation();
 	if (!currentPath) return null
 
@@ -56,7 +74,15 @@ export default function LearningPath() {
 	const updatedPath={...currentPath,steps:updatedSteps}
     
 	setCurrentPath(updatedPath)
-	storePath(updatedPath)
+	await storeCurrentPath(updatedPath,userId,false)
+	if (userId){
+		try{
+			await updatePath(updatedPath)
+		}
+		catch(error){
+			console.error('failed to store in database',error)
+		}
+	}
   };
 
 
