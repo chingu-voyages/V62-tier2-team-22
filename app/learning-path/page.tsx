@@ -20,10 +20,7 @@ export default function LearningPath() {
   const { data: session, status } = useSession();
   const userId = session?.user?.id || null;
 
-  const [currentPath, setCurrentPath] = useState<PathInformation | null>(() => {
-    if (typeof window === "undefined") return null;
-    return retrieveCurrentPath(null) ?? null;
-  });
+  const [currentPath, setCurrentPath] = useState<PathInformation | null>(null);
 
   const [isLoading, setIsLoading] = useState(true);
   const [expandedSteps, setExpandedSteps] = useState<Record<number, boolean>>({
