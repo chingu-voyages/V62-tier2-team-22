@@ -5,7 +5,8 @@ import Link from "next/link";
 import { AuthStatus } from "../Authentication/AuthButton";
 import { usePathname, useRouter } from "next/navigation";
 import { retrieveCurrentPath } from "@/lib/storage";
-import { useSession } from "next-auth/react"; 
+import { useSession } from "next-auth/react";
+
 interface NavbarProps {
   appName?: string;
 }
@@ -49,11 +50,12 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
   }, [showStartOverConfirm]);
 
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
-const { status } = useSession();
+  const { status } = useSession();
   const isAuthenticated = status === "authenticated";
   const navLinks = [
-...(isAuthenticated ? [{ name: "Learning Path", href: "/learning-path" }] : []),
+    ...(isAuthenticated ? [{ name: "Learning Path", href: "/learning-path" }] : []),
   ];
+
   return (
     <>
       <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/80 backdrop-blur-md">
@@ -100,10 +102,10 @@ const { status } = useSession();
                     key={link.href}
                     href={link.href}
                     className={`text-sm font-medium transition-colors ${
-  isActive
-    ? "bg-cyan-400 text-black hover:bg-cyan-300 font-semibold px-4 py-1.5 rounded-lg shadow-sm"
-    : "text-gray-600 hover:bg-cyan-100 px-4 py-1.5 rounded-lg"
-}`}
+                      isActive
+                        ? "bg-cyan-400 text-black hover:bg-cyan-300 font-semibold px-4 py-1.5 rounded-lg shadow-sm"
+                        : "text-gray-600 hover:bg-cyan-100 px-4 py-1.5 rounded-lg"
+                    }`}
                   >
                     {link.name}
                   </Link>
@@ -157,7 +159,7 @@ const { status } = useSession();
 
         {/* Mobile Dropdown Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden border-t border-gray-200 bg-white px-6 py-4 space-y-4 flex flex-col items-stretch shadow-lg">
+          <div className="md:hidden border-t border-gray-200 bg-white px-6 py-4 space-y-3 flex flex-col items-stretch shadow-lg">
             <nav className="flex flex-col space-y-3">
               {navLinks.map((link) => {
                 const isActive = pathname === link.href;
@@ -176,12 +178,14 @@ const { status } = useSession();
               })}
             </nav>
 
-            <hr className="border-gray-200 my-2" />
+            {/* Divider
+            <hr className="border-gray-200 my-1" /> */}
 
-            <div className="flex justify-center w-full">
+            <div className="flex justify-start w-full px-2 py-1">
               <AuthStatus />
             </div>
 
+            {/* Mobile Text-Style Buttons */}
             {pathname === "/learning-path" && hasPath ? (
               <button
                 type="button"
@@ -189,7 +193,7 @@ const { status } = useSession();
                   closeMobileMenu();
                   setShowStartOverConfirm(true);
                 }}
-                className="w-full text-center cursor-pointer rounded-lg bg-cyan-400 px-4 py-2.5 text-sm font-semibold text-black shadow-sm hover:bg-cyan-300 transition-all active:scale-95"
+                className="w-full text-left text-base font-medium text-gray-700 hover:text-cyan-600 hover:bg-gray-50 px-2 py-1 rounded-md transition-colors"
               >
                 Start A New Path
               </button>
@@ -197,7 +201,7 @@ const { status } = useSession();
               <Link
                 href="/career"
                 onClick={closeMobileMenu}
-                className="w-full text-center rounded-lg bg-cyan-400 px-4 py-2.5 text-sm font-semibold text-black shadow-sm hover:bg-cyan-300 transition-all active:scale-95"
+                className="w-full text-left text-base font-medium text-gray-700 hover:text-cyan-600 hover:bg-gray-50 px-2 py-1 rounded-md transition-colors"
               >
                 Build My Path
               </Link>

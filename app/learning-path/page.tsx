@@ -155,41 +155,45 @@ export default function LearningPath() {
         <>
           <style>{keyframesStyle}</style>
           <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-            <div
-              ref={modalRef}
-              className="bg-gradient-to-br from-emerald-600 via-teal-600 to-sky-700 text-white rounded-3xl p-6 md:p-8 text-center shadow-2xl border border-emerald-400/30 animate-pop-in relative overflow-hidden w-full max-w-sm  flex flex-col items-center justify-center"
-            >
-              {/* Close Button */}
-              <button
-                onClick={() => setIsCelebrationDismissed(true)}
-                className="absolute top-4 right-4 text-white/70 hover:text-white bg-black/10 hover:bg-black/20 rounded-full p-2 transition-all cursor-pointer"
-                title="Close"
-              >
-                ✕
-              </button>
+  <div
+    ref={modalRef}
+    className="bg-gradient-to-br from-emerald-600 via-teal-600 to-sky-700 text-white rounded-2xl p-4 md:px-6 md:py-5 text-center shadow-2xl border border-emerald-400/30 animate-pop-in relative overflow-hidden w-full max-w-md flex flex-col items-center justify-center"
+  >
+    {/* Close Button */}
+    <button
+      onClick={() => setIsCelebrationDismissed(true)}
+      className="absolute top-3 right-3 text-white/70 hover:text-white bg-black/10 hover:bg-black/20 rounded-full p-1.5 transition-all cursor-pointer text-xs"
+      title="Close"
+    >
+      ✕
+    </button>
 
-              <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_30%,rgba(255,255,255,0.25),transparent_70%)] pointer-events-none" />
+    <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_30%,rgba(255,255,255,0.25),transparent_70%)] pointer-events-none" />
 
-              <div className="inline-flex p-4 bg-white/10 rounded-2xl mb-5 backdrop-blur-md shadow-inner border border-white/10">
-                <Sparkles className="w-10 h-10 text-yellow-300 animate-pulse" />
-              </div>
+    {/* Sparkles Icon Container - Reduced Size & Margin */}
+    <div className="inline-flex p-2.5 bg-white/10 rounded-xl mb-3 backdrop-blur-md shadow-inner border border-white/10">
+      <Sparkles className="w-6 h-6 text-yellow-300 animate-pulse" />
+    </div>
 
-              <h2 className="text-3xl md:text-4xl font-black tracking-tight mb-3 drop-shadow-md">
-                Congratulations! 🎉
-              </h2>
+    {/* Heading - Reduced Size & Margin */}
+    <h2 className="text-xl md:text-2xl font-black tracking-tight mb-1 drop-shadow-md">
+      Congratulations! 🎉
+    </h2>
 
-              <p className="text-emerald-100 text-base md:text-lg font-medium leading-relaxed mb-6">
-                You have completed your path!
-              </p>
+    {/* Subtitle - Reduced Margin */}
+    <p className="text-emerald-100 text-sm md:text-base font-medium leading-normal mb-4">
+      You have completed your path!
+    </p>
 
-              <button
-                onClick={() => setIsCelebrationDismissed(true)}
-                className="bg-white text-emerald-800 font-bold px-6 py-2.5 rounded-xl hover:bg-emerald-50 transition-all shadow-md active:scale-95 text-sm cursor-pointer"
-              >
-                Continue
-              </button>
-            </div>
-          </div>
+    {/* Action Button */}
+    <button
+      onClick={() => setIsCelebrationDismissed(true)}
+      className="bg-white text-emerald-800 font-bold px-5 py-2 rounded-xl hover:bg-emerald-50 transition-all shadow-md active:scale-95 text-xs cursor-pointer"
+    >
+      Continue
+    </button>
+  </div>
+</div>
         </>
       )}
 
@@ -269,8 +273,8 @@ export default function LearningPath() {
 
                   {isExpanded && (
                     <div className="px-5 pb-5 pt-2 border-t border-slate-100 grid gap-4">
-                      <div className="grid grid-cols-1 md:grid-cols-3  ">
-                        <div className="md:col-span-2 space-y-1 ">
+                      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 ">
+                        <div className="flex-1 space-y-3 ">
                           <h4 className="text-[11px] font-bold text-black uppercase tracking-wider">
                             DESCRIPTION
                           </h4>
@@ -285,7 +289,7 @@ export default function LearningPath() {
                           </p>
                         </div>
 
-                        <div className="space-y-3 flex flex-col pt-4 md:pt-0">
+                        <div className="shrink-0 pt-2 md:pt-0">
                           <div>
                             <button
                               onClick={(e) => toggleComplete(step.position, e)}
