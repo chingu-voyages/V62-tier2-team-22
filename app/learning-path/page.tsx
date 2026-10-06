@@ -157,7 +157,7 @@ export default function LearningPath() {
           <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
             <div
               ref={modalRef}
-              className="bg-gradient-to-br from-emerald-600 via-teal-600 to-sky-700 text-white rounded-3xl p-8 md:p-10 text-center shadow-2xl border border-emerald-400/30 animate-pop-in relative overflow-hidden w-full max-w-md aspect-square flex flex-col items-center justify-center"
+              className="bg-gradient-to-br from-emerald-600 via-teal-600 to-sky-700 text-white rounded-3xl p-6 md:p-8 text-center shadow-2xl border border-emerald-400/30 animate-pop-in relative overflow-hidden w-full max-w-sm  flex flex-col items-center justify-center"
             >
               {/* Close Button */}
               <button
@@ -269,15 +269,14 @@ export default function LearningPath() {
 
                   {isExpanded && (
                     <div className="px-5 pb-5 pt-2 border-t border-slate-100 grid gap-4">
-                      <div className="grid grid-cols-1 md:grid-cols-3">
-                        <div className="md:col-span-2 space-y-1">
+                      <div className="grid grid-cols-1 md:grid-cols-3  ">
+                        <div className="md:col-span-2 space-y-1 ">
                           <h4 className="text-[11px] font-bold text-black uppercase tracking-wider">
                             DESCRIPTION
                           </h4>
                           <p className="text-sm text-slate-600 leading-relaxed pb-4 md:pb-0">
                             {step.description}
                           </p>
-                          <br />
                           <h4 className="text-[11px] font-bold text-black uppercase tracking-wider">
                             WHY THIS MATTERS
                           </h4>
@@ -286,7 +285,7 @@ export default function LearningPath() {
                           </p>
                         </div>
 
-                        <div className="space-y-3 flex flex-col justify-end pt-8 md:pt-0 md:pl-6">
+                        <div className="space-y-3 flex flex-col pt-4 md:pt-0">
                           <div>
                             <button
                               onClick={(e) => toggleComplete(step.position, e)}

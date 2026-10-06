@@ -5,7 +5,7 @@ import Link from "next/link";
 import { AuthStatus } from "../Authentication/AuthButton";
 import { usePathname, useRouter } from "next/navigation";
 import { retrieveCurrentPath } from "@/lib/storage";
-
+import { useSession } from "next-auth/react"; 
 interface NavbarProps {
   appName?: string;
 }
@@ -49,13 +49,11 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
   }, [showStartOverConfirm]);
 
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
-
+const { status } = useSession();
+  const isAuthenticated = status === "authenticated";
   const navLinks = [
-    { name: "Home", href: "/" },
-    { name: "Career Profile", href: "/career" },
-    { name: "Learning Path", href: "/learning-path" },
+...(isAuthenticated ? [{ name: "Learning Path", href: "/learning-path" }] : []),
   ];
-
   return (
     <>
       <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/80 backdrop-blur-md">
