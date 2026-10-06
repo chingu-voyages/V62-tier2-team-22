@@ -1,7 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 
-const PRIMARY_MODEL = "gemini-3.7-flash";
-const SECONDARY_MODEL = "gemini-3.6-flash"; 
+const PRIMARY_MODEL = "gemini-3.5-flash-lite";
+const SECONDARY_MODEL = "gemini-3.6-flash-lite"; 
 
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,

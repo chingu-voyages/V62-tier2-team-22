@@ -70,7 +70,7 @@ export default function AnalysisEngine({
             MASARI ANALYSIS ENGINE
           </span>
           <h1 className="text-3xl md:text-4xl font-bold text-white mt-3 mb-3 tracking-tight">
-            Constructing your route to {targetRole}
+            Constructing your route to <span className="capitalize">{targetRole}</span>
           </h1>
 
           <p className="text-slate-400 text-sm max-w-lg mx-auto mb-10 leading-relaxed">

@@ -56,10 +56,6 @@ export default function CareerProfilePage() {
 		}
 	}, [learningPath, router]);
 
-	useEffect(()=>{
-		setSearchParams(new URLSearchParams(window.location.search))
-	},[])
-
 	const updateField = (field: keyof learningPathRequest, value: FieldValue) => {
 		setFormData((prev) => ({ ...prev, [field]: value }));
 		setLearningPath(null);
@@ -116,6 +112,7 @@ export default function CareerProfilePage() {
 	const handleGeneratePath = async () => {
 		if (isGenerating) return;
 
+		setSearchParams(new URLSearchParams(window.location.search))
 		setIsGenerating(true);
 		setIsAnalyzing(true);
 		setAnalysisStep(1);
