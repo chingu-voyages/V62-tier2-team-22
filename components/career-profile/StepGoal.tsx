@@ -54,12 +54,12 @@ export default function StepGoal({ formData, onChange, errors }: StepGoalProps) 
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {levels.map((lvl) => {
-            const isSelected = formData.currentLevel === lvl.id;
+            const isSelected = formData.currentLevel === lvl.label;
             return (
               <button
                 key={lvl.id}
                 type="button"
-                onClick={() => onChange("currentLevel", lvl.id)}
+                onClick={() => onChange("currentLevel", lvl.label)}
                 className={`p-4 rounded-lg border text-left flex items-center justify-between transition ${
                   isSelected
                     ? "bg-cyan-50/50 border-cyan-400 text-slate-900"

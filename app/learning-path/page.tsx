@@ -1,10 +1,11 @@
 "use client";
 
-import { retrieveCurrentPath } from "@/lib/storage";
-import React, { useState, useEffect, useRef } from "react";
+import { storeCurrentPath, retrieveCurrentPath } from '@/lib/storage';
+import React, { useEffect, useState, useRef } from "react";
+import { PathInformation } from '@/schemas/learningPathSchemas';
+import { useSession } from 'next-auth/react';
 import confetti from "canvas-confetti";
-import { storePath } from "@/lib/storage";
-import { PathInformation } from "@/schemas/learningPathSchemas";
+
 import {
   ChevronDown,
   ChevronUp,
@@ -12,19 +13,24 @@ import {
   Sparkles,
   Clock,
 } from "lucide-react";
+import Link from 'next/link';
+import { updatePath } from '../actions/path-actions';
 
 export default function LearningPath() {
+  const { data: session, status } = useSession();
+  const userId = session?.user?.id || null;
+
   const [currentPath, setCurrentPath] = useState<PathInformation | null>(() => {
     if (typeof window === "undefined") return null;
-    return retrieveCurrentPath() ?? null;
+    return retrieveCurrentPath(null) ?? null;
   });
 
+  const [isLoading, setIsLoading] = useState(true);
   const [expandedSteps, setExpandedSteps] = useState<Record<number, boolean>>({
     1: true,
   });
 
   const [isCelebrationDismissed, setIsCelebrationDismissed] = useState(false);
-
   const modalRef = useRef<HTMLDivElement>(null);
 
   const steps = currentPath?.steps ?? [];
@@ -59,6 +65,26 @@ export default function LearningPath() {
     };
   }, [showCelebration]);
 
+  useEffect(() => {
+    if (status === "loading") return;
+    async function fetchPath() {
+      try {
+        setIsLoading(true);
+        const path = await retrieveCurrentPath(userId);
+        setCurrentPath(path ?? null);
+      } catch (error) {
+        console.error('failed to fetch path', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchPath();
+  }, [userId, status]);
+
+  if (isLoading || status === "loading") {
+    return <div>Loading learning path...</div>;
+  }
+
   if (!steps.length) {
     return <div>No learning path found. Please generate one first.</div>;
   }
@@ -70,7 +96,7 @@ export default function LearningPath() {
     }));
   };
 
-  const toggleComplete = (position: number, e: React.MouseEvent) => {
+  const toggleComplete = async (position: number, e: React.MouseEvent) => {
     e.stopPropagation();
     if (!currentPath) return;
 
@@ -87,7 +113,17 @@ export default function LearningPath() {
 
     const updatedPath = { ...currentPath, steps: updatedSteps };
     setCurrentPath(updatedPath);
-    storePath(updatedPath);
+
+    // حفظ المسار في التخزين المحلي وفي قاعدة البيانات إذا وُجد userId
+    await storeCurrentPath(updatedPath, userId, false);
+
+    if (userId) {
+      try {
+        await updatePath(updatedPath);
+      } catch (error) {
+        console.error('failed to store in database', error);
+      }
+    }
   };
 
   const keyframesStyle = `
@@ -155,45 +191,40 @@ export default function LearningPath() {
         <>
           <style>{keyframesStyle}</style>
           <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-  <div
-    ref={modalRef}
-    className="bg-gradient-to-br from-emerald-600 via-teal-600 to-sky-700 text-white rounded-2xl p-4 md:px-6 md:py-5 text-center shadow-2xl border border-emerald-400/30 animate-pop-in relative overflow-hidden w-full max-w-md flex flex-col items-center justify-center"
-  >
-    {/* Close Button */}
-    <button
-      onClick={() => setIsCelebrationDismissed(true)}
-      className="absolute top-3 right-3 text-white/70 hover:text-white bg-black/10 hover:bg-black/20 rounded-full p-1.5 transition-all cursor-pointer text-xs"
-      title="Close"
-    >
-      ✕
-    </button>
+            <div
+              ref={modalRef}
+              className="bg-gradient-to-br from-emerald-600 via-teal-600 to-sky-700 text-white rounded-2xl p-4 md:px-6 md:py-5 text-center shadow-2xl border border-emerald-400/30 animate-pop-in relative overflow-hidden w-full max-w-md flex flex-col items-center justify-center"
+            >
+              <button
+                onClick={() => setIsCelebrationDismissed(true)}
+                className="absolute top-3 right-3 text-white/70 hover:text-white bg-black/10 hover:bg-black/20 rounded-full p-1.5 transition-all cursor-pointer text-xs"
+                title="Close"
+              >
+                ✕
+              </button>
 
-    <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_30%,rgba(255,255,255,0.25),transparent_70%)] pointer-events-none" />
+              <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_30%,rgba(255,255,255,0.25),transparent_70%)] pointer-events-none" />
 
-    {/* Sparkles Icon Container - Reduced Size & Margin */}
-    <div className="inline-flex p-2.5 bg-white/10 rounded-xl mb-3 backdrop-blur-md shadow-inner border border-white/10">
-      <Sparkles className="w-6 h-6 text-yellow-300 animate-pulse" />
-    </div>
+              <div className="inline-flex p-2.5 bg-white/10 rounded-xl mb-3 backdrop-blur-md shadow-inner border border-white/10">
+                <Sparkles className="w-6 h-6 text-yellow-300 animate-pulse" />
+              </div>
 
-    {/* Heading - Reduced Size & Margin */}
-    <h2 className="text-xl md:text-2xl font-black tracking-tight mb-1 drop-shadow-md">
-      Congratulations! 🎉
-    </h2>
+              <h2 className="text-xl md:text-2xl font-black tracking-tight mb-1 drop-shadow-md">
+                Congratulations! 🎉
+              </h2>
 
-    {/* Subtitle - Reduced Margin */}
-    <p className="text-emerald-100 text-sm md:text-base font-medium leading-normal mb-4">
-      You have completed your path!
-    </p>
+              <p className="text-emerald-100 text-sm md:text-base font-medium leading-normal mb-4">
+                You have completed your path!
+              </p>
 
-    {/* Action Button */}
-    <button
-      onClick={() => setIsCelebrationDismissed(true)}
-      className="bg-white text-emerald-800 font-bold px-5 py-2 rounded-xl hover:bg-emerald-50 transition-all shadow-md active:scale-95 text-xs cursor-pointer"
-    >
-      Continue
-    </button>
-  </div>
-</div>
+              <button
+                onClick={() => setIsCelebrationDismissed(true)}
+                className="bg-white text-emerald-800 font-bold px-5 py-2 rounded-xl hover:bg-emerald-50 transition-all shadow-md active:scale-95 text-xs cursor-pointer"
+              >
+                Continue
+              </button>
+            </div>
+          </div>
         </>
       )}
 
@@ -273,8 +304,8 @@ export default function LearningPath() {
 
                   {isExpanded && (
                     <div className="px-5 pb-5 pt-2 border-t border-slate-100 grid gap-4">
-                      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 ">
-                        <div className="flex-1 space-y-3 ">
+                      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                        <div className="flex-1 space-y-3">
                           <h4 className="text-[11px] font-bold text-black uppercase tracking-wider">
                             DESCRIPTION
                           </h4>
@@ -287,6 +318,41 @@ export default function LearningPath() {
                           <p className="text-sm text-slate-600 leading-relaxed">
                             {step.whyItMatters}
                           </p>
+                          <div className="pt-4">
+                            <h4 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                              Learning resources
+                            </h4>
+
+                            {step.resources?.length ? (
+                              <ul className="mt-3 space-y-2">
+                                {step.resources.map((resource) => (
+                                  <li key={resource.url}>
+                                    <a
+                                      href={resource.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="block rounded-lg border border-slate-200 p-3 transition hover:border-sky-400 focus-visible:outline-2 focus-visible:outline-sky-500"
+                                    >
+                                      <span className="text-sm font-semibold text-sky-700">
+                                        {resource.title}
+                                      </span>
+
+                                      <span className="mt-1 flex items-center gap-2 text-xs text-slate-500">
+                                        <span className="capitalize">{resource.type}</span>
+                                        <span>·</span>
+                                        <span>{resource.isFree ? "Free" : "Paid"}</span>
+                                        <span>· Opens in a new tab</span>
+                                      </span>
+                                    </a>
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <p className="mt-2 text-sm text-slate-500">
+                                No learning resources are available for this step right now.
+                              </p>
+                            )}
+                          </div>
                         </div>
 
                         <div className="shrink-0 pt-2 md:pt-0">

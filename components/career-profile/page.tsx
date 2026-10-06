@@ -3,14 +3,17 @@
 import { useState, useEffect } from "react";
 import StepGoal from "@/components/career-profile/StepGoal";
 import StepLevel from "@/components/career-profile/StepLevel";
+import { useSession } from "next-auth/react";
 import StepBackground from "@/components/career-profile/StepBackground";
+import { useSearchParams } from "next/navigation";
 import StepCommitment from "@/components/career-profile/StepCommitment";
 import AnalysisEngine from "@/components/career-profile/AnalysisEngine";
 import { learningPathRequest, learningPathRequestSchemas } from "../../schemas/formSchemas";
 import { Check, Compass, Layers, BookOpen, Target } from "lucide-react";
 import type { LearningPathResponse, PathInformation } from "@/schemas/learningPathSchemas";
-import { storePath } from "@/lib/storage";
+import { storeCurrentPath } from "@/lib/storage";
 import { useRouter } from 'next/navigation'
+import { createPath } from "@/app/actions/path-actions";
 
 type FieldValue = string | string[] | number | undefined;
 
@@ -22,7 +25,10 @@ const STEPS = [
 ];
 
 export default function CareerProfilePage() {
+	const {data:session} =useSession()
+	const userId=session?.user?.id || null
 	const router = useRouter();
+	const [searchParams,setSearchParams]=useState<URLSearchParams | null>(null)
 	const [step, setStep] = useState(1);
 	const [errors, setErrors] = useState<{ [key: string]: string }>({});
 	const [isGenerating, setIsGenerating] = useState(false);
@@ -49,6 +55,10 @@ export default function CareerProfilePage() {
 			router.replace("/learning-path");
 		}
 	}, [learningPath, router]);
+
+	useEffect(()=>{
+		setSearchParams(new URLSearchParams(window.location.search))
+	},[])
 
 	const updateField = (field: keyof learningPathRequest, value: FieldValue) => {
 		setFormData((prev) => ({ ...prev, [field]: value }));
@@ -139,7 +149,9 @@ export default function CareerProfilePage() {
 				steps: result.data.steps
 			}
 
-			storePath(pathInfo)
+			const deleteCurrent=searchParams?.get('deleteCurrent') === 'true'
+			await storeCurrentPath(pathInfo,userId,deleteCurrent)
+			await createPath(pathInfo)
 
 			setAnalysisStep(5);
 			await new Promise((resolve) => setTimeout(resolve, 800));

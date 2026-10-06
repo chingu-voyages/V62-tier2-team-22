@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useSyncExternalStore } from "react";
+import React, { useState, useEffect, useSyncExternalStore, useCallback } from "react";
 import Link from "next/link";
 import { AuthStatus } from "../Authentication/AuthButton";
 import { usePathname, useRouter } from "next/navigation";
-import { retrieveCurrentPath } from "@/lib/storage";
+import { getCurrentPathKey, retrieveCurrentPath } from "@/lib/storage";
 import { useSession } from "next-auth/react";
+import { PathInformation } from "@/schemas/learningPathSchemas";
 
 interface NavbarProps {
   appName?: string;
@@ -18,15 +19,20 @@ function subscribeToStorage(callback: () => void) {
   };
 }
 
-function hasCurrentPath() {
-  return Boolean(retrieveCurrentPath());
-}
-
 export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
+  const { data: session, status } = useSession();
+  const userId = session?.user?.id || null;
   const pathname = usePathname();
   const router = useRouter();
-  const hasPath = useSyncExternalStore(subscribeToStorage, hasCurrentPath, () => false);
 
+  // جلب مفتاح المسار الحالي بناءً على userId
+  const getSnapshot = useCallback(() => {
+    if (typeof window === "undefined") return false;
+    return Boolean(localStorage.getItem(getCurrentPathKey(userId)));
+  }, [userId]);
+
+  const [currentPath, setCurrentPath] = useState<PathInformation | null>(null);
+  const hasPath = useSyncExternalStore(subscribeToStorage, getSnapshot, () => false);
   const [showStartOverConfirm, setShowStartOverConfirm] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -50,11 +56,30 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
   }, [showStartOverConfirm]);
 
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
-  const { status } = useSession();
   const isAuthenticated = status === "authenticated";
+
   const navLinks = [
     ...(isAuthenticated ? [{ name: "Learning Path", href: "/learning-path" }] : []),
   ];
+
+  // تم إضافة userId إلى قائمة التبعيات لضمان إعادة الجلب عند تغير المستخدم
+  useEffect(() => {
+    async function fetchPath() {
+      const path = await retrieveCurrentPath(userId);
+      setCurrentPath(path ?? null);
+    }
+    fetchPath();
+  }, [userId]);
+
+  let deleteCurrent: boolean = false;
+  if (Boolean(currentPath)) {
+    for (let i = 0; i < currentPath!.steps.length; i++) {
+      if (!currentPath!.steps[i].completed) {
+        deleteCurrent = true;
+        break;
+      }
+    }
+  }
 
   return (
     <>
@@ -178,9 +203,6 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
               })}
             </nav>
 
-            {/* Divider
-            <hr className="border-gray-200 my-1" /> */}
-
             <div className="flex justify-start w-full px-2 py-1">
               <AuthStatus />
             </div>
@@ -245,7 +267,7 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
                 type="button"
                 onClick={() => {
                   setShowStartOverConfirm(false);
-                  router.push("/career");
+                  router.push(`/career?deleteCurrent=${deleteCurrent}`);
                 }}
                 className="rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-black hover:bg-cyan-300"
               >
