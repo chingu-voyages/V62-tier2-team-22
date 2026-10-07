@@ -77,6 +77,7 @@ export async function retrieveCurrentPath(userId:string|null):Promise<PathInform
 				
 				storedPaths[path.id]={
 					id:path.id,
+					completed:path.completed,
 					createdAt:path.createdAt.toISOString(),
 					formData:path.formData as unknown as learningPathRequest,
 					steps:path.steps as unknown as PathStep[]
