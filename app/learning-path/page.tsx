@@ -46,13 +46,13 @@ export default function LearningPath() {
 	fetchPath()
   },[userId,status])
 
-// //   if (isLoading || status==="loading") {
-//     return <Loading/>;
-// //   }
+  if (isLoading || status==="loading") {
+    return <Loading/>;
+  }
 
-//   if (!steps.length) {
+  if (!steps.length) {
     return <NoPathFound/>
-//   }
+  }
 
   const completedCount = steps.filter((m) => m.completed).length;
   const progressPercent = Math.round((completedCount / steps.length) * 100);
