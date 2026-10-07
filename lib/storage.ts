@@ -21,16 +21,22 @@ export async function storeCurrentPath(path:PathInformation, userId:string|null,
 	if (typeof window == "undefined") return
 
 	try{
-		const storageKey=getStorageKey(userId)
 		const currentPathKey=getCurrentPathKey(userId)
-		const pathStorage = localStorage.getItem(storageKey)
-		const pathDictionary:Record<string,PathInformation> =pathStorage?JSON.parse(pathStorage):{}
+		if (userId==null){
+			sessionStorage.setItem(currentPathKey,JSON.stringify(path))
+			return
+		}
+
+		const storageKey=getStorageKey(userId)
+		const pathStorage: string | null = localStorage.getItem(storageKey)
+		const pathDictionary: Record<string, PathInformation> = pathStorage ? JSON.parse(pathStorage) : {}
 
 		if (deletePrevious){
 			const currentPathId=localStorage.getItem(currentPathKey)
-			if (currentPathId && pathDictionary[currentPathId])
+			if (currentPathId && pathDictionary[currentPathId]){
 				delete pathDictionary[currentPathId]
-				await DatabaseUtils.deletePath(path.id).catch(console.error)
+				await DatabaseUtils.deletePath(currentPathId).catch(console.error)
+			}
 		}
 		pathDictionary[path.id]=path
 
@@ -48,25 +54,30 @@ export async function retrieveCurrentPath(userId:string|null):Promise<PathInform
 		return null
 
 	try{
-		const storageKey=getStorageKey(userId)
 		const currentPathKey=getCurrentPathKey(userId)
+		if (userId==null){
+			// handle guest users
+			const currentPath=sessionStorage.getItem(currentPathKey)
+			const currentPathParsed= currentPath? JSON.parse(currentPath) : null
+			return currentPathParsed
+		}
+
+		const storageKey=getStorageKey(userId)
 		let storedPaths:Record<string,PathInformation> ={}
 		let currentPathId=localStorage.getItem(currentPathKey)
 		if (currentPathId==null){
-			if (!userId)
-				return null
-
 			const paths=await DatabaseUtils.retrieveAllPaths()
 
 			if (paths.length==0)
 				return null
 
-			paths.forEach((path,_)=>{
-				if (_==0){
+			paths.forEach((path,index)=>{
+				if (index===0)
 					currentPathId=path.id
-				}
+				
 				storedPaths[path.id]={
 					id:path.id,
+					completed:path.completed,
 					createdAt:path.createdAt.toISOString(),
 					formData:path.formData as unknown as learningPathRequest,
 					steps:path.steps as unknown as PathStep[]
@@ -85,9 +96,18 @@ export async function retrieveCurrentPath(userId:string|null):Promise<PathInform
 		storedPaths=paths?JSON.parse(paths):{}
 
 		if (!Object.hasOwn(storedPaths,currentPathId)){
-			return null
+			const remainingIds=Object.keys(storedPaths)
+			
+			if (remainingIds.length>0){
+				const fallbackId=remainingIds[remainingIds.length-1]
+				localStorage.setItem(currentPathKey,fallbackId)
+				return storedPaths[fallbackId]
+			}
+			else{
+				localStorage.removeItem(currentPathKey)
+				return null
+			}
 		}
-
 		return storedPaths[currentPathId]
 	}
 	catch (e){
