@@ -29,7 +29,7 @@ function getDeleteCurrent(userId:string | null):boolean{
 	if (userId==null)
 		return true
 
-	const paths=localStorage.getItem(getCurrentPathKey(userId))
+	const paths=localStorage.getItem(getStorageKey(userId))
 	const pathDict:Record<string,PathInformation> =paths?JSON.parse(paths):{}
 
 	const keys=pathDict?Object.keys(pathDict):[]
