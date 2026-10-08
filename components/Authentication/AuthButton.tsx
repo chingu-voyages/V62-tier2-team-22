@@ -4,6 +4,7 @@ import Link from "next/link"
 import {signIn,signOut,useSession} from "next-auth/react"
 import { usePathname, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
+import { Suspense } from "react"
 
 interface SignInProps {
 	redirectTo?:string
@@ -58,7 +59,7 @@ className="inline-flex items-center justify-center rounded-lg bg-red-600 px-4 py
 	)
 }
 
-export function AuthStatus(){
+function AuthStatusContent(){
 	const {data:session,status} =useSession()
 	const searchParams=useSearchParams()
 	const [redirectTo,setRedirectTo]=useState('/')
@@ -93,4 +94,12 @@ export function AuthStatus(){
 			</Link>
 		)
 	}
+}
+
+export function AuthStatus(){
+	return (
+		<Suspense fallback={<span>Loading...</span>}>
+			<AuthStatus/>
+		</Suspense>
+	)
 }
