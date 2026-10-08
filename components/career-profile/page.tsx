@@ -150,8 +150,8 @@ export default function CareerProfilePage() {
 				steps: result.data.steps
 			}
 
-			const deleteCurrent=searchParams?.get('deleteCurrent') === 'true'
-			await storeCurrentPath(pathInfo,userId,deleteCurrent)
+			const deletePrevious=searchParams?.get('deletePrevious') === 'true'
+			await storeCurrentPath(pathInfo,userId,deletePrevious)
 			await createPath(pathInfo)
 
 			setAnalysisStep(5);

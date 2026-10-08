@@ -1,6 +1,6 @@
 "use client";
 
-import {storeCurrentPath,retrieveCurrentPath} from '@/lib/storage'
+import {storeCurrentPath,retrieveCurrentPath, getCurrentPathKey} from '@/lib/storage'
 import React, { useEffect, useState } from "react";
 import { PathInformation } from '@/schemas/learningPathSchemas';
 import { useSession } from 'next-auth/react';
@@ -14,6 +14,9 @@ import {
 } from "lucide-react";
 import Link from 'next/link';
 import { updatePath } from '../actions/path-actions';
+import { useSearchParams } from 'next/navigation';
+import { getStorageKey } from '@/lib/storage';
+import { getDeletePrevious } from '@/components/career-profile/Navbar';
 
 
 export default function LearningPath() {
@@ -25,14 +28,32 @@ export default function LearningPath() {
   const steps=currentPath?.steps??[]
   const {data:session,status} = useSession()
   const userId=session?.user?.id || null
+  const searchParams=useSearchParams()
+
+  const fromGuest=searchParams.get('fromGuest')==='true'
 
   useEffect(()=>{
 	if (status==="loading") return
 	async function fetchPath(){
 		try{
 			setIsLoading(true)
-			const path = await retrieveCurrentPath(userId)
-			setCurrentPath(path ?? null)
+			let path:PathInformation | null =null
+			if (fromGuest){
+				const pathInfo=sessionStorage.getItem(getCurrentPathKey(null))	
+				path=pathInfo?JSON.parse(pathInfo):null
+				setCurrentPath(path ?? null)
+				if (path){
+					await storeCurrentPath(path,userId,getDeletePrevious(userId))
+					sessionStorage.clear()
+
+					const newUrl = window.location.pathname;
+  					window.history.replaceState({}, '', newUrl);
+				}
+			}
+			else{
+				path = await retrieveCurrentPath(userId)
+				setCurrentPath(path)
+			}
 		}
 		catch(error){
 			console.error('failed to fetch path',error)
@@ -42,7 +63,7 @@ export default function LearningPath() {
 		}
 	}
 	fetchPath()
-  },[userId,status])
+  },[fromGuest,userId,status])
 
   if (isLoading || status==="loading") {
     return <div>Loading learning path...</div>;
