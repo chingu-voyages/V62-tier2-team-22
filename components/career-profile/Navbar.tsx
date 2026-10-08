@@ -146,8 +146,8 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
               {userId == null ? (
                 <>
                   <p className="mt-3 text-sm text-slate-600">
-                    Your path won&apos;t be saved, sign in to save
-					your paths
+                    Create an account to save your current 
+					path and create additional learning paths.
                   </p>
                   <div className="mt-6 flex justify-end gap-3">
                     <button
@@ -165,7 +165,7 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
                       }}
                       className="rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-black"
                     >
-                      Sign in
+					  Create an account
                     </button>
                   </div>
                 </>
