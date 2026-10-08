@@ -2,12 +2,20 @@
 
 import Link from "next/link"
 import {signIn,signOut,useSession} from "next-auth/react"
+import { usePathname, useSearchParams } from "next/navigation"
+import { useEffect, useState } from "react"
 
-export function SignInButtons(){
+interface SignInProps {
+	redirectTo?:string
+}
+
+
+
+export function SignInButtons({redirectTo="/"} :SignInProps){
 	return (
 		<div className="flex flex-col gap-3 w-full max-w-sm mx-auto">
 			<button
-				onClick={()=>signIn("google",{redirectTo:"/"})}
+				onClick={()=>signIn("google",{redirectTo:redirectTo})}
 				//implement styles here
 				className="flex items-center justify-center gap-3 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700 transition-all active:scale-[0.98]"
 				><svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -31,7 +39,7 @@ export function SignInButtons(){
         <span>Sign in with Google</span></button>
 			
 			<button
-				onClick={()=>signIn("github",{redirectTo:"/"})}
+				onClick={()=>signIn("github",{redirectTo:redirectTo})}
 				//implement styles here
 				className="flex items-center justify-center gap-3 w-full rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 dark:bg-gray-700 dark:hover:bg-gray-600 transition-all active:scale-[0.98]"
 				><svg className="h-5 w-5 fill-current" viewBox="0 0 24 24">
@@ -52,6 +60,17 @@ className="inline-flex items-center justify-center rounded-lg bg-red-600 px-4 py
 
 export function AuthStatus(){
 	const {data:session,status} =useSession()
+	const searchParams=useSearchParams()
+	const [redirectTo,setRedirectTo]=useState('/')
+	const pathname=usePathname()
+
+	useEffect(()=>{
+		const rawRedirect=searchParams.get('redirectTo') || pathname || '/'
+		const safeRedirect=rawRedirect.startsWith('/')?rawRedirect:`/${rawRedirect}`
+
+		setRedirectTo(safeRedirect)
+	},[searchParams,pathname])
+
 	
 	if (status=='loading'){
 		return (
@@ -69,7 +88,7 @@ export function AuthStatus(){
 	}
 	else{
 		return (
-			<Link href="/login" className="inline-flex items-center justify-center rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700 transition-colors">
+			<Link href={`/login?redirectTo=${encodeURIComponent(redirectTo)}`} className="inline-flex items-center justify-center rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700 transition-colors">
 				Login
 			</Link>
 		)

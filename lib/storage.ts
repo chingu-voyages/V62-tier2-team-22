@@ -5,7 +5,7 @@ import { learningPathRequest } from "@/schemas/formSchemas";
 
 export function getStorageKey(userId?:string | null):string{
 	if (!userId){
-		return 'guest_learning_paths'
+		return 'guest_learning_path'
 	}
 	return `${userId}_learning_paths`
 }
