@@ -28,7 +28,7 @@ export const Footer: React.FC<FooterProps> = ({ appName = "Masari" }) => {
           </div>
 
           <div className="flex space-x-6 text-sm text-gray-600 dark:text-gray-400">
-            <Link href="/privacy" className="hover:text-gray-900 dark:hover:text-white transition-colors">
+            <Link href="/privacy-policy" className="hover:text-gray-900 dark:hover:text-white transition-colors">
               Privacy Policy
             </Link>
             <Link href="/terms" className="hover:text-gray-900 dark:hover:text-white transition-colors">

@@ -2,9 +2,11 @@ import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 import GitHub from "next-auth/providers/github";
 
+const isDev=process.env.NODE_ENV==="development"
+const skipAuth = isDev && process.env.SKIP_AUTH === "true";
 
 export const {handlers, signIn,signOut,auth}=NextAuth({
-	providers:[
+	providers:skipAuth?[]:[
 		Google({
 			clientId:process.env.AUTH_GOOGLE_ID!,
 			clientSecret:process.env.AUTH_GOOGLE_SECRET!,
@@ -36,6 +38,18 @@ export const {handlers, signIn,signOut,auth}=NextAuth({
 			return token
 		},
 		async session({session,token}){
+			if (skipAuth){
+				return {
+					...session,
+					user:{
+						id:"aihegaiej",
+						name:"test",
+						email:"anas@yahoo.bro",
+						image:""
+					},
+					expires:new Date(Date.now()+24*60*60*1000).toISOString()
+				}
+			}
 			if(session.user && token.userId){
 				session.user.id= token.userId as string
 			}
