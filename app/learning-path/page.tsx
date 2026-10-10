@@ -20,17 +20,19 @@ export default function LearningPath() {
   const { data: session, status } = useSession();
   const userId = session?.user?.id || null;
 
-  const [currentPath, setCurrentPath] = useState<PathInformation | null>(() => {
-    if (typeof window === "undefined") return null;
-    return retrieveCurrentPath(null) ?? null;
-  });
+   const [currentPath, setCurrentPath] = useState<PathInformation | null>(null);
 
   const [isLoading, setIsLoading] = useState(true);
   const [expandedSteps, setExpandedSteps] = useState<Record<number, boolean>>({
     1: true,
   });
 
-  const [isCelebrationDismissed, setIsCelebrationDismissed] = useState(false);
+  const [isCelebrationDismissed, setIsCelebrationDismissed] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("hasSeenCelebration") === "true";
+});
+
+
   const modalRef = useRef<HTMLDivElement>(null);
 
   const steps = currentPath?.steps ?? [];
@@ -40,14 +42,22 @@ export default function LearningPath() {
   const isFinished = progressPercent === 100 && steps.length > 0;
   const showCelebration = isFinished && !isCelebrationDismissed;
 
+  const handleDismiss = () => {
+  setIsCelebrationDismissed(true);
+  localStorage.setItem("hasSeenCelebration", "true");
+}; 
+
   useEffect(() => {
-    if (isFinished) {
+    if (isFinished && !localStorage.getItem("hasSeenCelebration")) {
+    const alreadySeen = localStorage.getItem("hasSeenCelebration") === "true";
+      if (!alreadySeen) {
       confetti({
         particleCount: 120,
         spread: 70,
         origin: { y: 0.6 },
       });
     }
+  }
   }, [isFinished]);
 
   useEffect(() => {
@@ -55,7 +65,7 @@ export default function LearningPath() {
 
     const handleClickOutside = (event: MouseEvent) => {
       if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
-        setIsCelebrationDismissed(true);
+        handleDismiss();
       }
     };
 
@@ -105,6 +115,9 @@ export default function LearningPath() {
         const nextCompleted = !step.completed;
         if (!nextCompleted) {
           setIsCelebrationDismissed(false);
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("hasSeenCelebration");
+          }
         }
         return { ...step, completed: nextCompleted };
       }
@@ -114,7 +127,6 @@ export default function LearningPath() {
     const updatedPath = { ...currentPath, steps: updatedSteps };
     setCurrentPath(updatedPath);
 
-    // حفظ المسار في التخزين المحلي وفي قاعدة البيانات إذا وُجد userId
     await storeCurrentPath(updatedPath, userId, false);
 
     if (userId) {
@@ -196,7 +208,7 @@ export default function LearningPath() {
               className="bg-gradient-to-br from-emerald-600 via-teal-600 to-sky-700 text-white rounded-2xl p-4 md:px-6 md:py-5 text-center shadow-2xl border border-emerald-400/30 animate-pop-in relative overflow-hidden w-full max-w-md flex flex-col items-center justify-center"
             >
               <button
-                onClick={() => setIsCelebrationDismissed(true)}
+                onClick={handleDismiss}
                 className="absolute top-3 right-3 text-white/70 hover:text-white bg-black/10 hover:bg-black/20 rounded-full p-1.5 transition-all cursor-pointer text-xs"
                 title="Close"
               >
@@ -218,7 +230,7 @@ export default function LearningPath() {
               </p>
 
               <button
-                onClick={() => setIsCelebrationDismissed(true)}
+                onClick={handleDismiss}
                 className="bg-white text-emerald-800 font-bold px-5 py-2 rounded-xl hover:bg-emerald-50 transition-all shadow-md active:scale-95 text-xs cursor-pointer"
               >
                 Continue
@@ -303,23 +315,23 @@ export default function LearningPath() {
                   </div>
 
                   {isExpanded && (
-                    <div className="px-5 pb-5 pt-2 border-t border-slate-100 grid gap-4">
+                    <div className="px-5 pb-5 pt-5 border-t border-slate-100 grid gap-4">
                       <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                         <div className="flex-1 space-y-3">
                           <h4 className="text-[11px] font-bold text-black uppercase tracking-wider">
                             DESCRIPTION
                           </h4>
-                          <p className="text-sm text-slate-600 leading-relaxed pb-4 md:pb-0">
+                          <p className="text-sm text-slate-600 leading-relaxed">
                             {step.description}
                           </p>
-                          <h4 className="text-[11px] font-bold text-black uppercase tracking-wider">
+                          <h4 className="text-[11px] pt-2 font-bold text-black uppercase tracking-wider">
                             WHY THIS MATTERS
                           </h4>
                           <p className="text-sm text-slate-600 leading-relaxed">
                             {step.whyItMatters}
                           </p>
-                          <div className="pt-4">
-                            <h4 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                          <div className="pt-2">
+                            <h4 className="text-[11px] font-bold text-black uppercase tracking-wider">
                               Learning resources
                             </h4>
 
@@ -341,7 +353,6 @@ export default function LearningPath() {
                                         <span className="capitalize">{resource.type}</span>
                                         <span>·</span>
                                         <span>{resource.isFree ? "Free" : "Paid"}</span>
-                                        <span>· Opens in a new tab</span>
                                       </span>
                                     </a>
                                   </li>

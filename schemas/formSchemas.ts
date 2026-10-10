@@ -5,7 +5,7 @@ import {z} from "zod";
 export const learningPathRequestSchemas = z.object({
 
     targetRole: z.string().trim().min(1, "Target role is required"),
-    currentLevel: z.string().trim().min(1),
+    currentLevel: z.string().trim().min(1, "Current Skill role is required"),
     background: z.string().trim().min(1, "Background is required"),
     skills: z.string().optional(),
     availableTime: z.number().positive(),
