@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import Link from 'next/link';
 import { updatePath } from '../actions/path-actions';
+import Loading from '@/components/learning-path/Loading';
+import NoPathFound from '@/components/learning-path/NoPathFound';
 
 
 export default function LearningPath() {
@@ -45,11 +47,11 @@ export default function LearningPath() {
   },[userId,status])
 
   if (isLoading || status==="loading") {
-    return <div>Loading learning path...</div>;
+    return <Loading/>;
   }
 
   if (!steps.length) {
-    return <div>No learning path found. Please generate one first.</div>;
+    return <NoPathFound/>
   }
 
   const completedCount = steps.filter((m) => m.completed).length;
