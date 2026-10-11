@@ -3,9 +3,9 @@
 import React, { useState, useEffect, useSyncExternalStore, useCallback } from "react";
 import Link from "next/link";
 import { AuthStatus } from "../Authentication/AuthButton";
-import { getCurrentPathKey, retrieveCurrentPath,getStorageKey } from "@/lib/storage";
 import { usePathname } from "next/navigation";
-import {useRouter} from 'next/navigation'
+import { getCurrentPathKey, getStorageKey, retrieveCurrentPath } from '@/lib/storage'
+import { useRouter } from 'next/navigation'
 import { useSession } from "next-auth/react";
 import { PathInformation } from "@/schemas/learningPathSchemas";
 
@@ -22,28 +22,23 @@ function subscribeToStorage(callback: () => void) {
 }
 
 
-function getDeleteCurrent(userId:string | null):boolean{
+export function getDeletePrevious(userId:string | null):boolean{
 	if (userId==null)
 		return true
 
-	const paths=localStorage.getItem(getStorageKey(userId))
-	const pathDict:Record<string,PathInformation> =paths?JSON.parse(paths):{}
+  const paths = localStorage.getItem(getStorageKey(userId))
+  const pathDict: Record<string, PathInformation> = paths ? JSON.parse(paths) : {}
 
-	const keys=pathDict?Object.keys(pathDict):[]
-	if (!pathDict || keys.length==0)
-		return false
+  const keys = pathDict ? Object.keys(pathDict) : []
+  if (!pathDict || keys.length == 0)
+    return false
 
-	let uncompletedCount:number=0
-	keys.forEach((key)=>{
-		if (!pathDict[key].completed){
-			uncompletedCount+=1
-		}
-	})
+  const pathCount=keys.length
 
-	if (uncompletedCount>3 || keys.length>10)
-		return true
+  if (pathCount>3)
+    return true
 
-	return false
+  return false
 }
 
 
@@ -87,6 +82,13 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
   const navLinks = [
     ...(isAuthenticated ? [{ name: "Learning Path", href: "/learning-path" }] : []),
   ];
+  useEffect(() => {
+    async function fetchPath() {
+      const path = await retrieveCurrentPath(userId)
+      setCurrentPath(path ?? null)
+    }
+    fetchPath()
+  }, [])
 
   return (
     <>
@@ -230,7 +232,7 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
               <Link
                 href="/career"
                 onClick={closeMobileMenu}
-                className="w-full text-left text-base font-medium text-gray-700 hover:text-cyan-600 hover:bg-gray-50 px-2 py-1 rounded-md transition-colors"
+                className="w-full text-left text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 px-2 py-1 rounded-md transition-colors"
               >
                 Build My Path
               </Link>
@@ -258,34 +260,61 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
             <h2 id="start-over-title" className="text-lg font-semibold text-slate-900">
               Start a new learning path?
             </h2>
-            <p className="mt-3 text-sm text-slate-600">
-              Once your new path is generated, it will become your current path.
-              Your progress on this path won&apos;t carry over.
-            </p>
-            <div className="mt-6 flex justify-end gap-3">
-              <button
-                type="button"
-                onClick={() => setShowStartOverConfirm(false)}
-                className="rounded-lg bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-300"
-              >
-                Keep current path
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setShowStartOverConfirm(false);
-                  router.push(`/career?deleteCurrent=${getDeleteCurrent(userId)}`);
-                }}
-                className="rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-black hover:bg-cyan-300"
-              >
-                Start new path
-              </button>
-            </div>
+            {userId == null ? (
+              <>
+                <p className="mt-3 text-sm text-slate-600">
+                  Create an account to save your current path and create additional learning paths.
+                </p>
+                <div className="mt-6 flex justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowStartOverConfirm(false)}
+                    className="rounded-lg bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-300"
+                  >
+                    Keep current path
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowStartOverConfirm(false);
+                      router.push("/login?redirectTo=/learning-path?fromGuest=true");
+                    }}
+                    className="rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-black hover:bg-cyan-300"
+                  >
+                    Create an account
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="mt-3 text-sm text-slate-600">
+                  Once your new path is generated, it will become your current path. Your progress on this path won&apos;t carry over.
+                </p>
+                <div className="mt-6 flex justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowStartOverConfirm(false)}
+                    className="rounded-lg bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-300"
+                  >
+                    Keep current path
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowStartOverConfirm(false);
+                      router.push(`/career?deletePrevious=${getDeletePrevious(userId)}`);
+                    }}
+                    className="rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-black hover:bg-cyan-300"
+                  >
+                    Start new path
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
     </>
   );
-};
-
-export default Navbar;
+}
+export default Navbar

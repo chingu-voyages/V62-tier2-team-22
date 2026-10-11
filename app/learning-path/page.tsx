@@ -1,7 +1,8 @@
 "use client";
 
-import { storeCurrentPath, retrieveCurrentPath } from '@/lib/storage';
-import React, { useEffect, useState, useRef } from "react";
+import {storeCurrentPath,retrieveCurrentPath, getCurrentPathKey} from '@/lib/storage'
+import { Suspense } from 'react';
+import React, { useEffect, useState,useRef } from "react";
 import { PathInformation } from '@/schemas/learningPathSchemas';
 import { useSession } from 'next-auth/react';
 import confetti from "canvas-confetti";
@@ -15,24 +16,28 @@ import {
 } from "lucide-react";
 import Link from 'next/link';
 import { updatePath } from '../actions/path-actions';
+import { useSearchParams } from 'next/navigation';
+import { getStorageKey } from '@/lib/storage';
+import { getDeletePrevious } from '@/components/career-profile/Navbar';
 import Loading from '@/components/learning-path/Loading';
 import NoPathFound from '@/components/learning-path/NoPathFound';
 
-export default function LearningPath() {
-  const { data: session, status } = useSession();
-  const userId = session?.user?.id || null;
 
-  const [currentPath, setCurrentPath] = useState<PathInformation | null>(null);
-
-  const [isLoading, setIsLoading] = useState(true);
+function LearningPath() {
+  const [currentPath,setCurrentPath] = useState<PathInformation | null>(null)
+  const [isLoading,setIsLoading] = useState(true)
   const [expandedSteps, setExpandedSteps] = useState<Record<number, boolean>>({
-    1: true,
+	1: true,
   });
+  const steps=currentPath?.steps??[]
+  const {data:session,status} = useSession()
+  const userId=session?.user?.id || null
+  const searchParams=useSearchParams()
 
+  const fromGuest=searchParams.get('fromGuest')==='true'
   const [isCelebrationDismissed, setIsCelebrationDismissed] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
 
-  const steps = currentPath?.steps ?? [];
   const completedCount = steps.filter((m) => m.completed).length;
   const progressPercent = steps.length > 0 ? Math.round((completedCount / steps.length) * 100) : 0;
 
@@ -64,21 +69,38 @@ export default function LearningPath() {
     };
   }, [showCelebration]);
 
-  useEffect(() => {
-    if (status === "loading") return;
-    async function fetchPath() {
-      try {
-        setIsLoading(true);
-        const path = await retrieveCurrentPath(userId);
-        setCurrentPath(path ?? null);
-      } catch (error) {
-        console.error('failed to fetch path', error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    fetchPath();
-  }, [userId, status]);
+  useEffect(()=>{
+	if (status==="loading") return
+	async function fetchPath(){
+		try{
+			setIsLoading(true)
+			let path:PathInformation | null =null
+			if (fromGuest){
+				const pathInfo=sessionStorage.getItem(getCurrentPathKey(null))	
+				path=pathInfo?JSON.parse(pathInfo):null
+				setCurrentPath(path ?? null)
+				if (path){
+					await storeCurrentPath(path,userId,getDeletePrevious(userId))
+					sessionStorage.clear()
+
+					const newUrl = window.location.pathname;
+  					window.history.replaceState({}, '', newUrl);
+				}
+			}
+			else{
+				path = await retrieveCurrentPath(userId)
+				setCurrentPath(path)
+			}
+		}
+		catch(error){
+			console.error('failed to fetch path',error)
+		}
+		finally{
+			setIsLoading(false)
+		}
+	}
+	fetchPath()
+  },[fromGuest,userId,status])
 
   if (isLoading || status==="loading") {
     return <Loading/>;
@@ -143,7 +165,8 @@ export default function LearningPath() {
   const unit = currentPath!.steps[0].estimatedTime.split(" ")[1];
 
   return (
-    <div className="min-h-screen bg-[#fafbfc] text-slate-800 pb-16">
+      <div className="min-h-screen bg-[#fafbfc] text-slate-800 pb-16">
+      {/* Top Header Bar */}
       {/* Hero Banner Header */}
       <div className="bg-[#0b1329] text-white px-6 py-10">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
@@ -417,4 +440,12 @@ export default function LearningPath() {
       </main>
     </div>
   );
+}
+
+export default function LearningPathPage(){
+  return (
+    <Suspense>
+      <LearningPath/>
+    </Suspense>
+  )
 }
