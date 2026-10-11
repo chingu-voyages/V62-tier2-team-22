@@ -29,7 +29,6 @@ export const learningPathResponseSchema = z.object({
 
 
 export type LearningStep = z.infer<typeof learningStepsSchema>;
-
 export type LearningPathResponse = z.infer<typeof learningPathResponseSchema>;
 export type LearningResource = z.infer<typeof learningResourceSchema>;
 
@@ -40,6 +39,7 @@ export interface PathStep extends LearningStep{
 export interface PathInformation {
 	id:string,
 	createdAt:string,
+	completed:boolean,
 	formData:learningPathRequest,
 	steps:PathStep[]
 }

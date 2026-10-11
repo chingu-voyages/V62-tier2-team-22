@@ -3,10 +3,12 @@
 import React, { useState, useEffect, useSyncExternalStore, useCallback } from "react";
 import Link from "next/link";
 import { AuthStatus } from "../Authentication/AuthButton";
-import { usePathname, useRouter } from "next/navigation";
-import { getCurrentPathKey, retrieveCurrentPath } from "@/lib/storage";
+import { getCurrentPathKey, retrieveCurrentPath,getStorageKey } from "@/lib/storage";
+import { usePathname } from "next/navigation";
+import {useRouter} from 'next/navigation'
 import { useSession } from "next-auth/react";
 import { PathInformation } from "@/schemas/learningPathSchemas";
+
 
 interface NavbarProps {
   appName?: string;
@@ -19,19 +21,43 @@ function subscribeToStorage(callback: () => void) {
   };
 }
 
+
+function getDeleteCurrent(userId:string | null):boolean{
+	if (userId==null)
+		return true
+
+	const paths=localStorage.getItem(getStorageKey(userId))
+	const pathDict:Record<string,PathInformation> =paths?JSON.parse(paths):{}
+
+	const keys=pathDict?Object.keys(pathDict):[]
+	if (!pathDict || keys.length==0)
+		return false
+
+	let uncompletedCount:number=0
+	keys.forEach((key)=>{
+		if (!pathDict[key].completed){
+			uncompletedCount+=1
+		}
+	})
+
+	if (uncompletedCount>3 || keys.length>10)
+		return true
+
+	return false
+}
+
+
 export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
   const { data: session, status } = useSession();
   const userId = session?.user?.id || null;
   const pathname = usePathname();
-  const router = useRouter();
-
-  // جلب مفتاح المسار الحالي بناءً على userId
-  const getSnapshot = useCallback(() => {
-    if (typeof window === "undefined") return false;
-    return Boolean(localStorage.getItem(getCurrentPathKey(userId)));
-  }, [userId]);
-
-  const [currentPath, setCurrentPath] = useState<PathInformation | null>(null);
+  const router=useRouter()
+  const getSnapshot= useCallback(()=>{
+	if (typeof window === "undefined") return false
+	const storage=userId?localStorage:sessionStorage
+	return Boolean(storage.getItem(getCurrentPathKey(userId)))
+  },[userId])
+  const [currentPath,setCurrentPath]=useState<PathInformation | null>(null)
   const hasPath = useSyncExternalStore(subscribeToStorage, getSnapshot, () => false);
   const [showStartOverConfirm, setShowStartOverConfirm] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -61,25 +87,6 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
   const navLinks = [
     ...(isAuthenticated ? [{ name: "Learning Path", href: "/learning-path" }] : []),
   ];
-
-  // تم إضافة userId إلى قائمة التبعيات لضمان إعادة الجلب عند تغير المستخدم
-  useEffect(() => {
-    async function fetchPath() {
-      const path = await retrieveCurrentPath(userId);
-      setCurrentPath(path ?? null);
-    }
-    fetchPath();
-  }, [userId]);
-
-  let deleteCurrent: boolean = false;
-  if (Boolean(currentPath)) {
-    for (let i = 0; i < currentPath!.steps.length; i++) {
-      if (!currentPath!.steps[i].completed) {
-        deleteCurrent = true;
-        break;
-      }
-    }
-  }
 
   return (
     <>
@@ -267,7 +274,7 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
                 type="button"
                 onClick={() => {
                   setShowStartOverConfirm(false);
-                  router.push(`/career?deleteCurrent=${deleteCurrent}`);
+                  router.push(`/career?deleteCurrent=${getDeleteCurrent(userId)}`);
                 }}
                 className="rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-black hover:bg-cyan-300"
               >
