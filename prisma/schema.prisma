@@ -15,6 +15,7 @@ datasource db {
 model LearningPath {
 	id String @id
 	userId String
+	completed Boolean @default(false)
 	createdAt DateTime @default(now())
 	formData Json
 	steps Json

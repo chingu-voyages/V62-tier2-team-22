@@ -15,6 +15,8 @@ import {
 } from "lucide-react";
 import Link from 'next/link';
 import { updatePath } from '../actions/path-actions';
+import Loading from '@/components/learning-path/Loading';
+import NoPathFound from '@/components/learning-path/NoPathFound';
 
 export default function LearningPath() {
   const { data: session, status } = useSession();
@@ -93,10 +95,34 @@ export default function LearningPath() {
 
   if (isLoading || status === "loading") {
     return <div>Loading learning path...</div>;
+  const steps=currentPath?.steps??[]
+  const {data:session,status} = useSession()
+  const userId=session?.user?.id || null
+
+  useEffect(()=>{
+	if (status==="loading") return
+	async function fetchPath(){
+		try{
+			setIsLoading(true)
+			const path = await retrieveCurrentPath(userId)
+			setCurrentPath(path ?? null)
+		}
+		catch(error){
+			console.error('failed to fetch path',error)
+		}
+		finally{
+			setIsLoading(false)
+		}
+	}
+	fetchPath()
+  },[userId,status])
+
+  if (isLoading || status==="loading") {
+    return <Loading/>;
   }
 
   if (!steps.length) {
-    return <div>No learning path found. Please generate one first.</div>;
+    return <NoPathFound/>
   }
 
   const toggleExpand = (position: number) => {

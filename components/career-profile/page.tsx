@@ -142,6 +142,7 @@ export default function CareerProfilePage() {
 			}
 			const pathInfo: PathInformation = {
 				id: crypto.randomUUID(),
+				completed:false,
 				createdAt: new Date().toISOString(),
 				formData,
 				steps: result.data.steps

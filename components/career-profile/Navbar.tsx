@@ -267,7 +267,7 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
                 type="button"
                 onClick={() => {
                   setShowStartOverConfirm(false);
-                  router.push(`/career?deleteCurrent=${deleteCurrent}`);
+                  router.push(`/career?deleteCurrent=${getDeleteCurrent(userId)}`);
                 }}
                 className="rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-black hover:bg-cyan-300"
               >
