@@ -5,7 +5,7 @@ import { learningPathRequest } from "@/schemas/formSchemas";
 
 export function getStorageKey(userId?:string | null):string{
 	if (!userId){
-		return 'guest_learning_paths'
+		return 'guest_learning_path'
 	}
 	return `${userId}_learning_paths`
 }
@@ -32,12 +32,19 @@ export async function storeCurrentPath(path:PathInformation, userId:string|null,
 		const pathDictionary: Record<string, PathInformation> = pathStorage ? JSON.parse(pathStorage) : {}
 
 		if (deletePrevious){
-			const currentPathId=localStorage.getItem(currentPathKey)
-			if (currentPathId && pathDictionary[currentPathId]){
-				delete pathDictionary[currentPathId]
-				await DatabaseUtils.deletePath(currentPathId).catch(console.error)
-			}
+			const keys=Object.keys(pathDictionary)
+			const oldestKey=keys.reduce((oldest,current)=>{
+				const currentVal=pathDictionary[current]
+				const oldestVal=pathDictionary[oldest]
+
+				return new Date(currentVal.createdAt).getTime()<new Date(oldestVal.createdAt).getTime()
+				? current
+				: oldest 
+			},keys[0])
+			delete pathDictionary[oldestKey]
+			await DatabaseUtils.deletePath(oldestKey).catch(console.error)
 		}
+
 		pathDictionary[path.id]=path
 
 		localStorage.setItem(storageKey,JSON.stringify(pathDictionary))

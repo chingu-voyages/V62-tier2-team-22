@@ -28,7 +28,6 @@ export default function CareerProfilePage() {
 	const {data:session} =useSession()
 	const userId=session?.user?.id || null
 	const router = useRouter();
-	const [searchParams,setSearchParams]=useState<URLSearchParams | null>(null)
 	const [step, setStep] = useState(1);
 	const [errors, setErrors] = useState<{ [key: string]: string }>({});
 	const [isGenerating, setIsGenerating] = useState(false);
@@ -50,15 +49,13 @@ export default function CareerProfilePage() {
 		learningPreference: "Project-based",
 	});
 
+
 	useEffect(() => {
 		if (learningPath) {
 			router.replace("/learning-path");
 		}
 	}, [learningPath, router]);
 
-	useEffect(()=>{
-		setSearchParams(new URLSearchParams(window.location.search))
-	},[])
 
 	const updateField = (field: keyof learningPathRequest, value: FieldValue) => {
 		setFormData((prev) => ({ ...prev, [field]: value }));
@@ -150,8 +147,9 @@ export default function CareerProfilePage() {
 				steps: result.data.steps
 			}
 
-			const deleteCurrent=searchParams?.get('deleteCurrent') === 'true'
-			await storeCurrentPath(pathInfo,userId,deleteCurrent)
+			const searchParams=new URLSearchParams(window.location.search)
+			const deletePrevious=searchParams?.get('deletePrevious') === 'true'
+			await storeCurrentPath(pathInfo,userId,deletePrevious)
 			await createPath(pathInfo)
 
 			setAnalysisStep(5);
