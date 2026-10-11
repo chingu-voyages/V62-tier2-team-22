@@ -54,10 +54,10 @@ export default function PrivacyPolicy() {
 								<strong>Account:</strong> means a unique account created for You to access Our Service or parts of Our Service.
 							</li>
 							<li>
-								<strong>Affiliate:</strong> means an entity that controls, is controlled by, or is under common control with a party, where "control" means ownership of 50% or more of the shares, equity interest or other securities entitled to vote for election of directors or other managing authority.
+								<strong>Affiliate:</strong> means an entity that controls, is controlled by, or is under common control with a party, where &quot;control&quot; means ownership of 50% or more of the shares, equity interest or other securities entitled to vote for election of directors or other managing authority.
 							</li>
 							<li>
-								<strong>Company:</strong> (referred to as either "the Company", "We", "Us" or "Our" in this Privacy Policy) refers to Masari.
+								<strong>Company:</strong> (referred to as either &quot;the Company&quot;, &quot;We&quot;, &quot;Us&quot; or &quot;Our&quot; in this Privacy Policy) refers to Masari.
 							</li>
 							<li>
 								<strong>Cookies:</strong> are small files that are placed on Your computer, mobile device or any other device by a website, containing the details of Your browsing history on that website, among its many uses.
@@ -69,7 +69,7 @@ export default function PrivacyPolicy() {
 								<strong>Device:</strong> means any device that can access the Service, such as a computer, a cell phone or a digital tablet.
 							</li>
 							<li>
-								<strong>Personal Data:</strong> (or "Personal Information") is any information that relates to an identified or identifiable individual. We use "Personal Data" and "Personal Information" interchangeably unless a law uses a specific term.
+								<strong>Personal Data:</strong> (or &quot;Personal Information&quot;) is any information that relates to an identified or identifiable individual. We use &quot;Personal Data&quot; and &quot;Personal Information&quot; interchangeably unless a law uses a specific term.
 							</li>
 							<li>
 								<strong>Service:</strong> refers to the Website.
@@ -120,7 +120,7 @@ export default function PrivacyPolicy() {
 
 					<h4 className="font-semibold text-slate-800 dark:text-slate-200 pt-2">Usage Data</h4>
 					<p>Usage Data is collected automatically when using the Service.</p>
-					<p>Usage Data may include information such as Your Device's Internet Protocol address (e.g. IP address), browser type, browser version, the pages of Our Service that You visit, the time and date of Your visit, the time spent on those pages, unique device identifiers and other diagnostic data.</p>
+					<p>Usage Data may include information such as Your Device&apos;s Internet Protocol address (e.g. IP address), browser type, browser version, the pages of Our Service that You visit, the time and date of Your visit, the time spent on those pages, unique device identifiers and other diagnostic data.</p>
 
 					<h4 className="font-semibold text-slate-800 dark:text-slate-200 pt-2">Tracking Technologies and Cookies</h4>
 					<p>We use tracking technologies (such as cookies) to track the activity and to improve Our Service. The technologies We use may include:</p>
