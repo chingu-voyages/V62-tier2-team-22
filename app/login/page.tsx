@@ -15,6 +15,7 @@ const ERROR_MESSAGES: Record<string, string> = {
 export function LoginContent() {
   const searchParams = useSearchParams()
   const errorKey = searchParams.get("error")
+  const redirectTo=searchParams.get("redirectTo") ?? "/"
 
   const errorMessage = errorKey ? (ERROR_MESSAGES[errorKey] ?? ERROR_MESSAGES.Default) : null
 
@@ -42,7 +43,7 @@ export function LoginContent() {
       )}
 
       {/* Authentication Buttons (Google & GitHub) */}
-      <SignInButtons />
+      <SignInButtons redirectTo={redirectTo}/>
 
       {/* Footer / Links */}
       <div className="mt-6 text-center text-xs text-gray-500 dark:text-gray-400">
