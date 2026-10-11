@@ -48,11 +48,11 @@ export function LoginContent() {
       {/* Footer / Links */}
       <div className="mt-6 text-center text-xs text-gray-500 dark:text-gray-400">
         By signing in, you agree to our{" "}
-        <Link href="/terms" className="underline hover:text-gray-800 dark:hover:text-gray-200">
+        <Link href="/terms-of-service" className="underline hover:text-gray-800 dark:hover:text-gray-200">
           Terms of Service
         </Link>{" "}
         and{" "}
-        <Link href="/privacy" className="underline hover:text-gray-800 dark:hover:text-gray-200">
+        <Link href="/privacy-policy" className="underline hover:text-gray-800 dark:hover:text-gray-200">
           Privacy Policy
         </Link>
         .
