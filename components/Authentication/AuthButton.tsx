@@ -62,15 +62,10 @@ className="inline-flex items-center justify-center rounded-lg bg-red-600 px-4 py
 function AuthStatusContent(){
 	const {data:session,status} =useSession()
 	const searchParams=useSearchParams()
-	const [redirectTo,setRedirectTo]=useState('/')
 	const pathname=usePathname()
-
-	useEffect(()=>{
-		const rawRedirect=searchParams.get('redirectTo') || pathname || '/'
-		const safeRedirect=rawRedirect.startsWith('/')?rawRedirect:`/${rawRedirect}`
-
-		setRedirectTo(safeRedirect)
-	},[searchParams,pathname])
+	
+	const rawRedirect = searchParams.get('redirectTo') || pathname || '/'
+	const redirectTo = rawRedirect.startsWith('/') ? rawRedirect : `/${rawRedirect}`
 
 	
 	if (status=='loading'){
@@ -99,7 +94,7 @@ function AuthStatusContent(){
 export function AuthStatus(){
 	return (
 		<Suspense fallback={<span>Loading...</span>}>
-			<AuthStatus/>
+			<AuthStatusContent/>
 		</Suspense>
 	)
 }
