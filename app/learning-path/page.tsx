@@ -1,6 +1,7 @@
 "use client";
 
 import {storeCurrentPath,retrieveCurrentPath, getCurrentPathKey} from '@/lib/storage'
+import { Suspense } from 'react';
 import React, { useEffect, useState } from "react";
 import { PathInformation } from '@/schemas/learningPathSchemas';
 import { useSession } from 'next-auth/react';
@@ -19,7 +20,7 @@ import { getStorageKey } from '@/lib/storage';
 import { getDeletePrevious } from '@/components/career-profile/Navbar';
 
 
-export default function LearningPath() {
+function LearningPath() {
   const [currentPath,setCurrentPath] = useState<PathInformation | null>(null)
   const [isLoading,setIsLoading] = useState(true)
   const [expandedSteps, setExpandedSteps] = useState<Record<number, boolean>>({
@@ -111,8 +112,7 @@ export default function LearningPath() {
   const unit=currentPath!.steps[0].estimatedTime.split(' ')[1]
 
   return (
-    
-    <div className="min-h-screen bg-[#fafbfc] text-slate-800 pb-16">
+      <div className="min-h-screen bg-[#fafbfc] text-slate-800 pb-16">
       {/* Top Header Bar */}
       {/* Hero Banner Header */}
       <div className="bg-[#0b1329] text-white px-6 py-10">
@@ -408,7 +408,14 @@ export default function LearningPath() {
           </div>
         </section>
       </main>
-    </div>
-    
+      </div>
   );
+}
+
+export default function LearningPathPage(){
+  return (
+    <Suspense>
+      <LearningPath/>
+    </Suspense>
+  )
 }
