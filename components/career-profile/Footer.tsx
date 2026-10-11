@@ -27,8 +27,13 @@ export const Footer: React.FC<FooterProps> = ({ appName = "Masari" }) => {
             </p>
           </div>
 
+<<<<<<< HEAD
           <div className="flex space-x-6 text-sm text-gray-600 dark:text-gray-400">
             <Link href="/privacy-policy" className="hover:text-gray-900 dark:hover:text-white transition-colors">
+=======
+          {/*<div className="flex space-x-6 text-sm text-gray-600 dark:text-gray-400">
+            <Link href="/privacy" className="hover:text-gray-900 dark:hover:text-white transition-colors">
+>>>>>>> dev
               Privacy Policy
             </Link>
             <Link href="/terms" className="hover:text-gray-900 dark:hover:text-white transition-colors">
@@ -37,7 +42,7 @@ export const Footer: React.FC<FooterProps> = ({ appName = "Masari" }) => {
             <Link href="/contact" className="hover:text-gray-900 dark:hover:text-white transition-colors">
               Contact Us
             </Link>
-          </div>
+          </div>*/}
         </div>
       </div>
     </footer>

@@ -9,7 +9,7 @@ import { useSearchParams } from "next/navigation";
 import StepCommitment from "@/components/career-profile/StepCommitment";
 import AnalysisEngine from "@/components/career-profile/AnalysisEngine";
 import { learningPathRequest, learningPathRequestSchemas } from "../../schemas/formSchemas";
-import { Check, Compass, Layers, BookOpen, Target } from "lucide-react";
+import { Check, Compass, Layers, BookOpen, Target, AlertCircle } from "lucide-react";
 import type { LearningPathResponse, PathInformation } from "@/schemas/learningPathSchemas";
 import { storeCurrentPath } from "@/lib/storage";
 import { useRouter } from 'next/navigation'
@@ -28,7 +28,6 @@ export default function CareerProfilePage() {
 	const {data:session} =useSession()
 	const userId=session?.user?.id || null
 	const router = useRouter();
-	const [searchParams,setSearchParams]=useState<URLSearchParams | null>(null)
 	const [step, setStep] = useState(1);
 	const [errors, setErrors] = useState<{ [key: string]: string }>({});
 	const [isGenerating, setIsGenerating] = useState(false);
@@ -37,10 +36,10 @@ export default function CareerProfilePage() {
 
 	const [isAnalyzing, setIsAnalyzing] = useState(false);
 	const [analysisStep, setAnalysisStep] = useState(1);
-
+	
 	const [formData, setFormData] = useState<learningPathRequest>({
 		targetRole: "",
-		currentLevel: "beginner",
+		currentLevel: "Beginner",
 		background: "",
 		skills: "",
 		relevantExperience: "",
@@ -50,15 +49,14 @@ export default function CareerProfilePage() {
 		learningPreference: "Project-based",
 	});
 
+
 	useEffect(() => {
 		if (learningPath) {
 			router.replace("/learning-path");
 		}
 	}, [learningPath, router]);
 
-	useEffect(()=>{
-		setSearchParams(new URLSearchParams(window.location.search))
-	},[])
+	
 
 	const updateField = (field: keyof learningPathRequest, value: FieldValue) => {
 		setFormData((prev) => ({ ...prev, [field]: value }));
@@ -115,7 +113,6 @@ export default function CareerProfilePage() {
 
 	const handleGeneratePath = async () => {
 		if (isGenerating) return;
-
 		setIsGenerating(true);
 		setIsAnalyzing(true);
 		setAnalysisStep(1);
@@ -150,8 +147,9 @@ export default function CareerProfilePage() {
 				steps: result.data.steps
 			}
 
-			const deleteCurrent=searchParams?.get('deleteCurrent') === 'true'
-			await storeCurrentPath(pathInfo,userId,deleteCurrent)
+			const searchParams=new URLSearchParams(window.location.search)
+			const deletePrevious=searchParams?.get('deletePrevious') === 'true'
+			await storeCurrentPath(pathInfo,userId,deletePrevious)
 			await createPath(pathInfo)
 
 			setAnalysisStep(5);
@@ -248,9 +246,21 @@ export default function CareerProfilePage() {
             <StepComp formData={formData} onChange={updateField} errors={errors} />
           )}
           {generationError && !isGenerating && (
-            <p role="alert" className="mt-4 text-sm text-red-600">
-              {generationError}
-            </p>
+            <div role="alert" className="mt-6 rounded-xl border border-rose-500/20 bg-rose-500/10 p-4 text-rose-200 shadow-sm backdrop-blur-sm">
+              <div className="flex items-start gap-3">
+                <div className="rounded-lg bg-rose-500/20 p-2 text-rose-500 shrink-0 border border-rose-500/30">
+                  <AlertCircle className="w-5 h-5" />
+                </div>
+                <div className="flex-1 pt-0.5">
+                  <h3 className="font-semibold text-rose-700 text-sm md:text-base leading-none mb-1">
+                    Error Occurred
+                  </h3>
+                  <p className="text-xs md:text-sm text-rose-600 leading-relaxed">
+                    {generationError}
+                  </p>
+                </div>
+              </div>
+            </div>
           )}
 
           {learningPath && !isGenerating && (
