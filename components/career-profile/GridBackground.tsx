@@ -43,7 +43,7 @@ export const GridBackground: React.FC<{ children?: React.ReactNode }> = ({ child
   }, []);
 
   return (
-    <div className="relative min-h-screen w-full bg-[#070c18] text-white">
+    <div className="relative  w-full bg-[#070c18] text-white">
       <canvas
         ref={canvasRef}
         className="absolute top-0 left-0 w-full h-full pointer-events-none z-0"

@@ -95,30 +95,6 @@ export default function LearningPath() {
 
   if (isLoading || status === "loading") {
     return <div>Loading learning path...</div>;
-  const steps=currentPath?.steps??[]
-  const {data:session,status} = useSession()
-  const userId=session?.user?.id || null
-
-  useEffect(()=>{
-	if (status==="loading") return
-	async function fetchPath(){
-		try{
-			setIsLoading(true)
-			const path = await retrieveCurrentPath(userId)
-			setCurrentPath(path ?? null)
-		}
-		catch(error){
-			console.error('failed to fetch path',error)
-		}
-		finally{
-			setIsLoading(false)
-		}
-	}
-	fetchPath()
-  },[userId,status])
-
-  if (isLoading || status==="loading") {
-    return <Loading/>;
   }
 
   if (!steps.length) {
