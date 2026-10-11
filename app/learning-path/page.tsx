@@ -18,6 +18,8 @@ import { updatePath } from '../actions/path-actions';
 import { useSearchParams } from 'next/navigation';
 import { getStorageKey } from '@/lib/storage';
 import { getDeletePrevious } from '@/components/career-profile/Navbar';
+import Loading from '@/components/learning-path/Loading';
+import NoPathFound from '@/components/learning-path/NoPathFound';
 
 
 function LearningPath() {
@@ -67,11 +69,11 @@ function LearningPath() {
   },[fromGuest,userId,status])
 
   if (isLoading || status==="loading") {
-    return <div>Loading learning path...</div>;
+    return <Loading/>;
   }
 
   if (!steps.length) {
-    return <div>No learning path found. Please generate one first.</div>;
+    return <NoPathFound/>
   }
 
   const completedCount = steps.filter((m) => m.completed).length;
