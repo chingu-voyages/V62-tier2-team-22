@@ -3,9 +3,8 @@
 import React, { useState, useEffect, useSyncExternalStore, useCallback } from "react";
 import Link from "next/link";
 import { AuthStatus } from "../Authentication/AuthButton";
-import { usePathname } from "next/navigation";
-import { getCurrentPathKey, getStorageKey, retrieveCurrentPath } from '@/lib/storage'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from "next/navigation";
+import { getCurrentPathKey, retrieveCurrentPath,getStorageKey } from "@/lib/storage";
 import { useSession } from "next-auth/react";
 import { PathInformation } from "@/schemas/learningPathSchemas";
 
@@ -23,9 +22,7 @@ function subscribeToStorage(callback: () => void) {
 
 
 export function getDeletePrevious(userId:string | null):boolean{
-	if (userId==null)
-		return true
-
+	if (userId==null) return true
   const paths = localStorage.getItem(getStorageKey(userId))
   const pathDict: Record<string, PathInformation> = paths ? JSON.parse(paths) : {}
 
@@ -46,7 +43,8 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
   const { data: session, status } = useSession();
   const userId = session?.user?.id || null;
   const pathname = usePathname();
-  const router=useRouter()
+  const router = useRouter();
+
   const getSnapshot= useCallback(()=>{
 	if (typeof window === "undefined") return false
 	const storage=userId?localStorage:sessionStorage
