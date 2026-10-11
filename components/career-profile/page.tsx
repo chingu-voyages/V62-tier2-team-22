@@ -56,7 +56,6 @@ export default function CareerProfilePage() {
 		}
 	}, [learningPath, router]);
 
-
 	const updateField = (field: keyof learningPathRequest, value: FieldValue) => {
 		setFormData((prev) => ({ ...prev, [field]: value }));
 		setLearningPath(null);
