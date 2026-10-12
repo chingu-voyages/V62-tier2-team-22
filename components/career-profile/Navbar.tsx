@@ -78,7 +78,8 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
   const isAuthenticated = status === "authenticated";
 
   const navLinks = [
-    ...(isAuthenticated ? [{ name: "Learning Path", href: "/learning-path" }] : []),
+    ...(isAuthenticated ? [{ name: "Learning Path", href: "/learning-path" },
+          { name: "My Path", href: "/my-path" },] : []),
   ];
   useEffect(() => {
     async function fetchPath() {
