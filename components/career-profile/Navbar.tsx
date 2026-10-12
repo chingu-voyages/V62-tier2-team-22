@@ -151,7 +151,7 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
           {/* Desktop Auth & Action Button */}
           <div className="hidden md:flex items-center space-x-4 rtl:space-x-reverse text-sm font-medium text-gray-700">
             <AuthStatus />
-            {pathname === "/learning-path" && hasPath ? (
+            {/* {pathname === "/learning-path" && hasPath ? (
               <button
                 type="button"
                 onClick={() => setShowStartOverConfirm(true)}
@@ -166,7 +166,27 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
               >
                 Build My Path
               </Link>
-            )}
+            )} */}
+			{
+				hasPath ?
+					(isAuthenticated?
+              			<button
+                			type="button"
+                			onClick={() => setShowStartOverConfirm(true)}
+                			className="inline-flex items-center cursor-pointer justify-center rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-black shadow-sm hover:bg-cyan-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-500 transition-all active:scale-95"
+              			>
+                			Start A New Path
+              			</button>
+					:navLinks.push({ name: "Learning Path", href: "/learning-path" })
+					)
+				:
+              	<Link
+                	href="/career"
+                	className="inline-flex items-center justify-center rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-black shadow-sm hover:bg-cyan-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-500 transition-all active:scale-95"
+              	>
+                	Build My Path
+              	</Link>
+			}
           </div>
 
           {/* Mobile Hamburger Button */}
