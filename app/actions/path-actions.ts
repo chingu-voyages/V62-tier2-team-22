@@ -1,6 +1,6 @@
 'use server'
 
-import { auth } from "@/app/auth"
+import { auth } from "@/lib/auth"
 import { Prisma } from "@/generated/prisma/browser"
 import { prisma } from "@/lib/prisma"
 import { PathInformation } from "@/schemas/learningPathSchemas"
