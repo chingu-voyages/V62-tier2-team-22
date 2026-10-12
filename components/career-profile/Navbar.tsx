@@ -259,32 +259,6 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
             <h2 id="start-over-title" className="text-lg font-semibold text-slate-900">
               Start a new learning path?
             </h2>
-<<<<<<< HEAD
-            <p className="mt-3 text-sm text-slate-600">
-              Once your new path is generated, it will become your current path.
-              Your progress on this path won&apos;t carry over.
-            </p>
-            <div className="mt-6 flex justify-end gap-3">
-              <button
-                type="button"
-                onClick={() => setShowStartOverConfirm(false)}
-                className="rounded-lg bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-300"
-              >
-                Keep current path
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setShowStartOverConfirm(false);
-                  //router.push(`/career?deleteCurrent=${getDeleteCurrent(userId)}`);
-                  router.push(`/career?deleteCurrent=${deleteCurrent}`);
-                }}
-                className="rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-black hover:bg-cyan-300"
-              >
-                Start new path
-              </button>
-            </div>
-=======
             {userId == null ? (
               <>
                 <p className="mt-3 text-sm text-slate-600">
@@ -336,7 +310,6 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
                 </div>
               </>
             )}
->>>>>>> dev
           </div>
         </div>
       )}
