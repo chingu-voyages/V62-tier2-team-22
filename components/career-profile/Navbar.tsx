@@ -59,7 +59,8 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
   const isAuthenticated = status === "authenticated";
 
   const navLinks = [
-    ...(isAuthenticated ? [{ name: "Learning Path", href: "/learning-path" }] : []),
+    ...(isAuthenticated ? [{ name: "Learning Path", href: "/learning-path" },
+          { name: "My Path", href: "/my-path" },] : []),
   ];
 
   // تم إضافة userId إلى قائمة التبعيات لضمان إعادة الجلب عند تغير المستخدم
@@ -267,7 +268,8 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
                 type="button"
                 onClick={() => {
                   setShowStartOverConfirm(false);
-                  router.push(`/career?deleteCurrent=${getDeleteCurrent(userId)}`);
+                  //router.push(`/career?deleteCurrent=${getDeleteCurrent(userId)}`);
+                  router.push(`/career?deleteCurrent=${deleteCurrent}`);
                 }}
                 className="rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-black hover:bg-cyan-300"
               >

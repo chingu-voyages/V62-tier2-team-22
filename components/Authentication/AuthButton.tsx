@@ -66,13 +66,19 @@ export function AuthStatus() {
 
   if (session?.user) {
     return (
-      <div className="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-3 w-full md:w-auto">
-        <span className="text-base md:text-sm font-semibold text-black !text-black">
-          {session.user.name}
-        </span>
-        <SignOutButton />
+  <div className="flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-4 w-full md:w-auto">
+    <div className="flex items-center gap-2">
+      <div className="w-9 h-9 bg-cyan-900 text-white rounded-full flex items-center justify-center font-semibold text-sm shrink-0">
+        {session?.user?.name ? session.user.name.charAt(0).toUpperCase() : "M"}
       </div>
-    )
+      <span className="text-base md:text-sm font-semibold text-black !text-black">
+        {session.user.name}
+      </span>
+    </div>
+
+    <SignOutButton />
+  </div>
+);
   } else {
     return (
       <Link
