@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { retrieveCurrentPath } from "@/lib/storage";
+import { deleteUserPath } from "@/lib/storage";
 import { 
   Trash2, 
   Plus, 
@@ -11,6 +12,7 @@ import {
   CheckCircle2, 
   X 
 } from "lucide-react";
+import { retrieveAllUserPaths } from "@/lib/storage";
 
 interface LearningPath {
   id: string;
@@ -22,10 +24,11 @@ interface LearningPath {
 
 export default function MyPathPage() {
   const router = useRouter();
+  const searchParams = useSearchParams(); 
   const { data: session, status } = useSession();
   const userId = session?.user?.id || null;
-
-  const [showBanner, setShowBanner] = useState<boolean>(true);
+  
+  const [showBanner, setShowBanner] = useState<boolean>(searchParams.get("migrated") === "true");
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const [selectedPathToDelete, setSelectedPathToDelete] = useState<LearningPath | null>(null);
@@ -34,48 +37,51 @@ export default function MyPathPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (status === "loading") return;
+  if (status === "loading") return;
 
-    async function fetchUserPaths() {
-      try {
-        setIsLoading(true);
-        // جلب الباث الحالي المخزن
-        const currentPathData = await retrieveCurrentPath(userId);
+  async function fetchUserPaths() {
+    try {
+      setIsLoading(true);
+      
+      const allPathsData = retrieveAllUserPaths(userId);
 
-        if (currentPathData) {
-          const steps = currentPathData.steps ?? [];
+      if (allPathsData && allPathsData.length > 0) {
+        const mappedPaths: LearningPath[] = allPathsData.map((pathData) => {
+          const steps = pathData.steps ?? [];
           const completedCount = steps.filter((m) => m.completed).length;
           const progressPercent = steps.length > 0 ? Math.round((completedCount / steps.length) * 100) : 0;
 
-          const dynamicPath: LearningPath = {
-            id: currentPathData.id || "1",
-            title: `${currentPathData.formData.currentLevel} to ${currentPathData.formData.targetRole}`,
-            category: currentPathData.formData.learningPreference || "Early career",
-            date: new Date().toLocaleDateString("en-GB"),
+          return {
+            id: pathData.id,
+            title: `${pathData.formData.currentLevel} to ${pathData.formData.targetRole}`,
+            category: pathData.formData.learningPreference || "Early career",
+            date: pathData.createdAt ? new Date(pathData.createdAt).toLocaleDateString("en-GB") : new Date().toLocaleDateString("en-GB"),
             progress: progressPercent,
           };
+        });
 
-          setPaths([dynamicPath]);
-        } else {
-          setPaths([]);
-        }
-      } catch (error) {
-        console.error("Failed to fetch learning paths:", error);
-      } finally {
-        setIsLoading(false);
+        setPaths(mappedPaths);
+      } else {
+        setPaths([]);
       }
+    } catch (error) {
+      console.error("Failed to fetch learning paths:", error);
+    } finally {
+      setIsLoading(false);
     }
+  }
 
-    fetchUserPaths();
-  }, [userId, status]);
+  fetchUserPaths();
+}, [userId, status]);
 
   const handleDeleteClick = (path: LearningPath) => {
     setSelectedPathToDelete(path);
     setIsDeleteModalOpen(true);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (selectedPathToDelete) {
+      await deleteUserPath(selectedPathToDelete.id, userId);
       setPaths(paths.filter((p) => p.id !== selectedPathToDelete.id));
     }
     setIsDeleteModalOpen(false);
