@@ -1,7 +1,10 @@
 'use client'
 
 import Link from "next/link"
-import { signIn, signOut, useSession } from "next-auth/react"
+import {signIn,signOut,useSession} from "next-auth/react"
+import { usePathname, useSearchParams } from "next/navigation"
+import { useEffect, useState } from "react"
+import { Suspense } from "react"
 
 export function SignInButtons() {
   return (
@@ -57,36 +60,42 @@ export function SignOutButton() {
   )
 }
 
-export function AuthStatus() {
-  const { data: session, status } = useSession()
+function AuthStatusContent(){
+	const {data:session,status} =useSession()
+	const searchParams=useSearchParams()
+	const pathname=usePathname()
+	
+	const rawRedirect = searchParams.get('redirectTo') || pathname || '/'
+	const redirectTo = rawRedirect.startsWith('/') ? rawRedirect : `/${rawRedirect}`
 
-  if (status === 'loading') {
-    return <span className="text-sm text-gray-500">Loading...</span>
-  }
+	
+	if (status=='loading'){
+		return (
+			<span>Loading...</span>
+		)
+	}
 
-  if (session?.user) {
-    return (
-  <div className="flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-4 w-full md:w-auto">
-    <div className="flex items-center gap-2">
-      <div className="w-9 h-9 bg-cyan-900 text-white rounded-full flex items-center justify-center font-semibold text-sm shrink-0">
-        {session?.user?.name ? session.user.name.charAt(0).toUpperCase() : "M"}
-      </div>
-      <span className="text-base md:text-sm font-semibold text-black !text-black">
-        {session.user.name}
-      </span>
-    </div>
+	if (session?.user){
+		return(
+			<div className="flex items-center gap-3">
+				<span>{session.user.name}</span>
+				<SignOutButton/>
+			</div>
+		)
+	}
+	else{
+		return (
+			<Link href={`/login?redirectTo=${encodeURIComponent(redirectTo)}`} className="inline-flex items-center justify-center rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700 transition-colors">
+				Login
+			</Link>
+		)
+	}
+}
 
-    <SignOutButton />
-  </div>
-);
-  } else {
-    return (
-      <Link
-        href="/login"
-        className="inline-flex items-center justify-start md:justify-center text-base md:text-sm font-medium text-gray-700 hover:text-cyan-600 p-0 bg-transparent md:bg-slate-900 md:px-4 md:py-2 md:text-white md:hover:bg-slate-800 md:rounded-lg transition-colors"
-      >
-        Login
-      </Link>
-    )
-  }
+export function AuthStatus(){
+	return (
+		<Suspense fallback={<span>Loading...</span>}>
+			<AuthStatusContent/>
+		</Suspense>
+	)
 }

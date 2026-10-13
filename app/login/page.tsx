@@ -15,6 +15,7 @@ const ERROR_MESSAGES: Record<string, string> = {
 export function LoginContent() {
   const searchParams = useSearchParams()
   const errorKey = searchParams.get("error")
+  const redirectTo=searchParams.get("redirectTo") ?? "/"
 
   const errorMessage = errorKey ? (ERROR_MESSAGES[errorKey] ?? ERROR_MESSAGES.Default) : null
 
@@ -42,16 +43,16 @@ export function LoginContent() {
       )}
 
       {/* Authentication Buttons (Google & GitHub) */}
-      <SignInButtons />
+      <SignInButtons redirectTo={redirectTo}/>
 
       {/* Footer / Links */}
       <div className="mt-6 text-center text-xs text-gray-500 dark:text-gray-400">
         By signing in, you agree to our{" "}
-        <Link href="/terms" className="underline hover:text-gray-800 dark:hover:text-gray-200">
+        <Link href="/terms-of-service" className="underline hover:text-gray-800 dark:hover:text-gray-200">
           Terms of Service
         </Link>{" "}
         and{" "}
-        <Link href="/privacy" className="underline hover:text-gray-800 dark:hover:text-gray-200">
+        <Link href="/privacy-policy" className="underline hover:text-gray-800 dark:hover:text-gray-200">
           Privacy Policy
         </Link>
         .

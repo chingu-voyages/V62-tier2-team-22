@@ -4,9 +4,10 @@ import React, { useState, useEffect, useSyncExternalStore, useCallback } from "r
 import Link from "next/link";
 import { AuthStatus } from "../Authentication/AuthButton";
 import { usePathname, useRouter } from "next/navigation";
-import { getCurrentPathKey, retrieveCurrentPath } from "@/lib/storage";
+import { getCurrentPathKey, retrieveCurrentPath,getStorageKey } from "@/lib/storage";
 import { useSession } from "next-auth/react";
 import { PathInformation } from "@/schemas/learningPathSchemas";
+
 
 interface NavbarProps {
   appName?: string;
@@ -19,19 +20,37 @@ function subscribeToStorage(callback: () => void) {
   };
 }
 
+
+export function getDeletePrevious(userId:string | null):boolean{
+	if (userId==null) return true
+  const paths = localStorage.getItem(getStorageKey(userId))
+  const pathDict: Record<string, PathInformation> = paths ? JSON.parse(paths) : {}
+
+  const keys = pathDict ? Object.keys(pathDict) : []
+  if (!pathDict || keys.length == 0)
+    return false
+
+  const pathCount=keys.length
+
+  if (pathCount>3)
+    return true
+
+  return false
+}
+
+
 export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
   const { data: session, status } = useSession();
   const userId = session?.user?.id || null;
   const pathname = usePathname();
   const router = useRouter();
 
-  // جلب مفتاح المسار الحالي بناءً على userId
-  const getSnapshot = useCallback(() => {
-    if (typeof window === "undefined") return false;
-    return Boolean(localStorage.getItem(getCurrentPathKey(userId)));
-  }, [userId]);
-
-  const [currentPath, setCurrentPath] = useState<PathInformation | null>(null);
+  const getSnapshot= useCallback(()=>{
+	if (typeof window === "undefined") return false
+	const storage=userId?localStorage:sessionStorage
+	return Boolean(storage.getItem(getCurrentPathKey(userId)))
+  },[userId])
+  const [currentPath,setCurrentPath]=useState<PathInformation | null>(null)
   const hasPath = useSyncExternalStore(subscribeToStorage, getSnapshot, () => false);
   const [showStartOverConfirm, setShowStartOverConfirm] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -60,27 +79,16 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
 
   const navLinks = [
     ...(isAuthenticated ? [{ name: "Learning Path", href: "/learning-path" },
-          { name: "My Path", href: "/my-path" },] : []),
+          { name: "My Path", href: "/my-path" },] : [{ name: "Learning Path", href: "/learning-path" }]),
   ];
 
-  // تم إضافة userId إلى قائمة التبعيات لضمان إعادة الجلب عند تغير المستخدم
   useEffect(() => {
     async function fetchPath() {
-      const path = await retrieveCurrentPath(userId);
-      setCurrentPath(path ?? null);
+      const path = await retrieveCurrentPath(userId)
+      setCurrentPath(path ?? null)
     }
-    fetchPath();
-  }, [userId]);
-
-  let deleteCurrent: boolean = false;
-  if (Boolean(currentPath)) {
-    for (let i = 0; i < currentPath!.steps.length; i++) {
-      if (!currentPath!.steps[i].completed) {
-        deleteCurrent = true;
-        break;
-      }
-    }
-  }
+    fetchPath()
+  }, [])
 
   return (
     <>
@@ -224,7 +232,7 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
               <Link
                 href="/career"
                 onClick={closeMobileMenu}
-                className="w-full text-left text-base font-medium text-gray-700 hover:text-cyan-600 hover:bg-gray-50 px-2 py-1 rounded-md transition-colors"
+                className="w-full text-left text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 px-2 py-1 rounded-md transition-colors"
               >
                 Build My Path
               </Link>
@@ -252,35 +260,61 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
             <h2 id="start-over-title" className="text-lg font-semibold text-slate-900">
               Start a new learning path?
             </h2>
-            <p className="mt-3 text-sm text-slate-600">
-              Once your new path is generated, it will become your current path.
-              Your progress on this path won&apos;t carry over.
-            </p>
-            <div className="mt-6 flex justify-end gap-3">
-              <button
-                type="button"
-                onClick={() => setShowStartOverConfirm(false)}
-                className="rounded-lg bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-300"
-              >
-                Keep current path
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setShowStartOverConfirm(false);
-                  //router.push(`/career?deleteCurrent=${getDeleteCurrent(userId)}`);
-                  router.push(`/career?deleteCurrent=${deleteCurrent}`);
-                }}
-                className="rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-black hover:bg-cyan-300"
-              >
-                Start new path
-              </button>
-            </div>
+            {userId == null ? (
+              <>
+                <p className="mt-3 text-sm text-slate-600">
+                  Create an account to save your current path and create additional learning paths.
+                </p>
+                <div className="mt-6 flex justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowStartOverConfirm(false)}
+                    className="rounded-lg bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-300"
+                  >
+                    Keep current path
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowStartOverConfirm(false);
+                      router.push("/login?redirectTo=/learning-path?fromGuest=true");
+                    }}
+                    className="rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-black hover:bg-cyan-300"
+                  >
+                    Create an account
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="mt-3 text-sm text-slate-600">
+                  Once your new path is generated, it will become your current path. Your progress on this path won&apos;t carry over.
+                </p>
+                <div className="mt-6 flex justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowStartOverConfirm(false)}
+                    className="rounded-lg bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-300"
+                  >
+                    Keep current path
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowStartOverConfirm(false);
+                      router.push(`/career?deletePrevious=${getDeletePrevious(userId)}`);
+                    }}
+                    className="rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-black hover:bg-cyan-300"
+                  >
+                    Start new path
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
     </>
   );
-};
-
-export default Navbar;
+}
+export default Navbar
