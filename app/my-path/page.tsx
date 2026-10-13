@@ -122,7 +122,7 @@ export default function MyPathPage() {
 
           <div>
             <button
-              onClick={() => router.push(`\career?deletePrevious=${deletePrevious}`)}
+              onClick={() => router.push(`/career?deletePrevious=${deletePrevious}`)}
               className="flex cursor-pointer items-center gap-2 px-5 py-2.5 text-sm font-medium text-black hover:bg-cyan-300 bg-cyan-400 rounded-xl transition-colors shadow-sm"
             >
               <Plus className="w-4 h-4" />
