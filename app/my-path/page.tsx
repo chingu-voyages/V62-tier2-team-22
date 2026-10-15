@@ -1,18 +1,23 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import React, { useState, useEffect, useRef, Suspense } from "react";
+import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { retrieveCurrentPath } from "@/lib/storage";
-import { deleteUserPath } from "@/lib/storage";
-import { 
-  Trash2, 
-  Plus, 
-  ArrowRight, 
-  CheckCircle2, 
-  X 
+import {
+  deleteUserPath,
+  getCurrentPathKey,
+  getStorageKey,
+  retrieveAllUserPaths,
+} from "@/lib/storage";
+import { retrievePath, updatePath } from "@/app/actions/path-actions";
+import type { PathInformation } from "@/schemas/learningPathSchemas";
+import {
+  Trash2,
+  Plus,
+  ArrowRight,
+  CheckCircle2,
+  X,
 } from "lucide-react";
-import { retrieveAllUserPaths } from "@/lib/storage";
 
 interface LearningPath {
   id: string;
@@ -24,24 +29,60 @@ interface LearningPath {
 
 function PathsPage() {
   const router = useRouter();
-  const searchParams = useSearchParams(); 
   const { data: session, status } = useSession();
   const userId = session?.user?.id || null;
   
-  const [showBanner, setShowBanner] = useState<boolean>(searchParams.get("migrated") === "true");
+  const [showBanner, setShowBanner] = useState(false);
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const [selectedPathToDelete, setSelectedPathToDelete] = useState<LearningPath | null>(null);
 
   const [paths, setPaths] = useState<LearningPath[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
+  const migrationRef = useRef<Promise<boolean> | null>(null);
   useEffect(() => {
   if (status === "loading") return;
 
   async function fetchUserPaths() {
     try {
       setIsLoading(true);
+      if (userId) {
+  if (!migrationRef.current) {
+    migrationRef.current = (async () => {
+      const guestKey = getCurrentPathKey(null);
+      const guestJson = sessionStorage.getItem(guestKey);
+      if (!guestJson) return false;
+
+      const guestPath = JSON.parse(guestJson) as PathInformation;
+      await updatePath(guestPath);
+
+      if (!(await retrievePath(guestPath.id))) {
+        throw new Error("Guest path was not saved to the account.");
+      }
+
+      const storageKey = getStorageKey(userId);
+      const saved = localStorage.getItem(storageKey);
+      const paths: Record<string, PathInformation> = saved
+        ? JSON.parse(saved)
+        : {};
+
+      paths[guestPath.id] = guestPath;
+      localStorage.setItem(storageKey, JSON.stringify(paths));
+      localStorage.setItem(getCurrentPathKey(userId), guestPath.id);
+      sessionStorage.removeItem(guestKey);
+
+      return true;
+    })().catch((error) => {
+      migrationRef.current = null;
+      throw error;
+    });
+  }
+
+  if (await migrationRef.current) setShowBanner(true);
+}
+
+
+
       
       const allPathsData = retrieveAllUserPaths(userId);
 
@@ -87,6 +128,12 @@ function PathsPage() {
     setIsDeleteModalOpen(false);
     setSelectedPathToDelete(null);
   };
+  const handleOpen = (pathId: string) => {
+  if (!userId) return;
+
+  localStorage.setItem(getCurrentPathKey(userId), pathId);
+  router.push("/learning-path");
+};
 
   if (isLoading || status === "loading") {
     return <div className="min-h-screen flex items-center justify-center bg-[#FAFAFA] text-slate-600">Loading your paths...</div>;
@@ -176,7 +223,7 @@ function PathsPage() {
 
                 <div className="flex items-center gap-3 mt-4">
                   <button
-                    onClick={() => router.push("/learning-path")}
+                    onClick={() => handleOpen(path.id)}
                     className="flex-1 cursor-pointer flex items-center justify-center gap-2 py-2.5 px-4 bg-cyan-400 hover:bg-cyan-300 text-black rounded-xl text-sm font-medium transition-colors shadow-sm"
                   >
                     Open

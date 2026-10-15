@@ -15,7 +15,7 @@ export function SignInButtons({redirectTo}:SignInButtonProps) {
     <div className="flex flex-col gap-3 w-full max-w-sm mx-auto">
       {/* Google Sign In */}
       <button
-        onClick={() => signIn("google", { redirectTo: "/my-path?migrated=true" })}
+        onClick={() => signIn("google", { redirectTo: "/my-path" })}
         className="flex items-center justify-start md:justify-center gap-3 w-full rounded-lg border-0 bg-transparent px-2 py-1 text-base font-medium text-gray-700 hover:text-cyan-600 hover:bg-gray-50 md:border md:border-gray-300 md:bg-gray-900 md:px-4 md:py-2.5 md:text-sm md:shadow-sm md:hover:bg-gray-50 dark:text-gray-200 dark:hover:bg-gray-800 transition-all active:scale-[0.98]"
       >
         <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24">
@@ -41,7 +41,7 @@ export function SignInButtons({redirectTo}:SignInButtonProps) {
 
       {/* GitHub Sign In */}
       <button
-        onClick={() => signIn("github", { redirectTo: "/my-path?migrated=true" })}
+        onClick={() => signIn("github", { redirectTo: "/my-path" })}
         className="flex items-center justify-start md:justify-center gap-3 w-full rounded-lg bg-transparent px-2 py-1 text-base font-medium text-gray-700 hover:text-cyan-600 hover:bg-gray-50 md:bg-gray-900 md:px-4 md:py-2.5 md:text-sm md:text-white md:shadow-sm md:hover:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-800 transition-all active:scale-[0.98]"
       >
         <svg className="h-5 w-5 fill-current shrink-0" viewBox="0 0 24 24">
