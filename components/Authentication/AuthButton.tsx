@@ -6,7 +6,11 @@ import { usePathname, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { Suspense } from "react"
 
-export function SignInButtons() {
+interface SignInButtonProps {
+  redirectTo:string
+}
+
+export function SignInButtons({redirectTo}:SignInButtonProps) {
   return (
     <div className="flex flex-col gap-3 w-full max-w-sm mx-auto">
       {/* Google Sign In */}

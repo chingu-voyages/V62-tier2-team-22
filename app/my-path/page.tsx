@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { retrieveCurrentPath } from "@/lib/storage";
@@ -22,7 +22,7 @@ interface LearningPath {
   progress: number;
 }
 
-export default function MyPathPage() {
+function PathsPage() {
   const router = useRouter();
   const searchParams = useSearchParams(); 
   const { data: session, status } = useSession();
@@ -227,4 +227,12 @@ export default function MyPathPage() {
       )}
     </div>
   );
+}
+
+export default function MyPathPage(){
+  return (
+    <Suspense fallback={<div>Loading</div>}>
+      <PathsPage/>
+    </Suspense>
+  )
 }
