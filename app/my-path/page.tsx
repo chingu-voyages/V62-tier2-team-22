@@ -166,7 +166,7 @@ function PathsPage() {
               My learning paths
             </h1>
             <p className="text-slate-500 text-sm mt-1">
-              Every path you generate is saved here permanently.
+              Every path you generate is saved here.
             </p>
           </div>          
         </div>

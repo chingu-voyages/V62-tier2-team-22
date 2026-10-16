@@ -3,7 +3,8 @@
 import Link from "next/link"
 import {signIn,signOut,useSession} from "next-auth/react"
 import { usePathname, useSearchParams } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react";
+import { LogOut } from "lucide-react";
 import { Suspense } from "react"
 
 interface SignInButtonProps {
@@ -59,22 +60,72 @@ export function SignInButtons({redirectTo}:SignInButtonProps) {
   );
 }
 
-export function SignOutButton() {
+// export function SignOutButton() {
+//   return (
+//     <button
+//       onClick={() => signOut({ redirectTo: "/" })}
+//       className="inline-flex w-full cursor-pointer items-center justify-start rounded-md border-0 bg-transparent px-2 py-1 text-base font-medium text-gray-700 transition-colors hover:bg-transparent hover:text-cyan-600 focus:outline-none"
+//     >
+//       Sign out
+//     </button>
+//   );
+// }
+
+export function SignOutButton({
+  className = "",
+  showIcon = false,
+}: {
+  className?: string;
+  showIcon?: boolean;
+}) {
   return (
     <button
+      type="button"
+      role={showIcon ? "menuitem" : undefined}
       onClick={() => signOut({ redirectTo: "/" })}
-      className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-slate-200 p-2.5 text-slate-500 transition-colors hover:bg-red-50 hover:text-red-600 focus:outline-none"
+      className={`inline-flex w-full cursor-pointer items-center border-0 bg-transparent font-medium text-gray-700 transition-colors hover:bg-transparent hover:text-cyan-600 focus:outline-none ${className}`}
     >
-      Sign out
+      {showIcon && <LogOut className="size-4 shrink-0" aria-hidden="true" />}
+      <span>Sign out</span>
     </button>
   );
 }
 
 function AuthStatusContent(){
+  const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
 	const {data:session,status} =useSession()
 	const searchParams=useSearchParams()
 	const pathname=usePathname()
 	
+  const accountMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isAccountMenuOpen) return;
+
+    const closeOnOutsideClick = (event: PointerEvent) => {
+      if (
+        event.target instanceof Node &&
+        !accountMenuRef.current?.contains(event.target)
+      ) {
+        setIsAccountMenuOpen(false);
+      }
+    };
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsAccountMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", closeOnOutsideClick);
+    document.addEventListener("keydown", closeOnEscape);
+
+    return () => {
+      document.removeEventListener("pointerdown", closeOnOutsideClick);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [isAccountMenuOpen]);
+
 	const rawRedirect = searchParams.get('redirectTo') || pathname || '/'
 	const redirectTo = rawRedirect.startsWith('/') ? rawRedirect : `/${rawRedirect}`
 
@@ -85,21 +136,61 @@ function AuthStatusContent(){
 		)
 	}
 
-	if (session?.user){
-		return(
-			<div className="flex items-center gap-3">
-				<span className="hidden md:inline">{session.user.name}</span>
-				<SignOutButton/>
-			</div>
-		)
-	}
-	else{
-		return (
-			<Link href={`/login?redirectTo=${encodeURIComponent(redirectTo)}`} className="inline-flex items-center justify-center px-0 py-0 text-base font-medium text-gray-700 transition-colors hover:text-cyan-600 md:rounded-lg md:bg-slate-900 md:px-4 md:py-2 md:text-sm md:text-white md:hover:bg-slate-800 dark:md:bg-slate-800 dark:md:text-slate-100 dark:md:hover:bg-slate-700">
-				Login
-			</Link>
-		)
-	}
+	// if (session?.user){
+	// 	return (
+  //     <div
+  //       className="inline-flex cursor-pointer items-center justify-center border-0 bg-transparent px-0 py-1 text-base font-medium text-gray-700 transition-colors hover:bg-transparent hover:text-cyan-600 focus:outline-none md:rounded-lg md:border md:border-slate-200 md:bg-transparent md:px-4 md:py-2 md:text-sm md:text-slate-500 md:hover:bg-red-50 md:hover:text-red-600"
+  //     >
+  //       <span className="hidden md:inline">{session.user.name}</span>
+  //       <SignOutButton />
+  //     </div>
+  //   );
+	// }
+
+  if (session?.user) {
+    return (
+      <div ref={accountMenuRef} className="relative">
+        <div className="hidden md:block">
+          <button
+            type="button"
+            onClick={() => setIsAccountMenuOpen((open) => !open)}
+            aria-expanded={isAccountMenuOpen}
+            aria-haspopup="menu"
+            className={`inline-flex items-center justify-center border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 ${
+              isAccountMenuOpen ? "rounded-t-lg rounded-b-none" : "rounded-lg"
+            }`}
+          >
+            {session.user.name || "Account"}
+          </button>
+
+          {isAccountMenuOpen && (
+            <div
+              role="menu"
+              className="absolute right-0 top-full z-50 w-full rounded-b-lg border border-t-0 border-gray-200 bg-white p-1 shadow-lg"
+            >
+              <SignOutButton
+              showIcon
+              className="justify-start gap-2 rounded-md px-3 py-2 text-left text-sm hover:bg-red-50 hover:text-red-600"
+              />
+            </div>
+          )}
+        </div>
+
+        <div className="md:hidden">
+          <SignOutButton />
+        </div>
+      </div>
+    );
+  } else {
+    return (
+      <Link
+        href={`/login?redirectTo=${encodeURIComponent(redirectTo)}`}
+        className="inline-flex items-center justify-center border-0 bg-transparent px-0 py-1 text-base font-medium text-gray-700 transition-colors hover:bg-transparent hover:text-cyan-600 md:rounded-lg md:bg-slate-900 md:px-4 md:py-2 md:text-sm md:text-white md:hover:bg-slate-800 md:hover:text-white dark:md:bg-slate-800 dark:md:text-slate-100 dark:md:hover:bg-slate-700"
+      >
+        Login
+      </Link>
+    );
+  }
 }
 
 export function AuthStatus(){

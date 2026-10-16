@@ -2,7 +2,7 @@
 
 **From where you are to where you want to be — one meaningful step at a time.**
 
-Masari is an AI-powered career planning app that helps learners turn their career goals into actionable learning paths. Share your target role, current experience, existing skills, available study time, and preferred learning style. Masari uses this information to generate an ordered learning path with estimated time commitments and links to relevant learning resources.
+Masari is an AI-powered career planning full-stack app that helps learners turn their career goals into actionable learning paths. Share your target role, current experience, existing skills, available study time, and preferred learning style. Masari uses this information to generate an ordered learning path with estimated time commitments and links to relevant learning resources.
 
 ## Contents
 
@@ -40,7 +40,7 @@ Masari is an AI-powered career planning app that helps learners turn their caree
 
 ## Live Demo
 
-Try Masari: [Open the live application](https://v62-tier2-team-22-pk61hq8st-anas88893142-7745.vercel.app/)
+Try Masari: [Open the live application](https://v62-tier2-team-22.vercel.app/)
 
 ## Technology
 

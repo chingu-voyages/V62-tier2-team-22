@@ -1,13 +1,21 @@
 "use client";
 
-import React, { useState, useEffect, useSyncExternalStore, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useSyncExternalStore,
+  useCallback,
+} from "react";
 import Link from "next/link";
 import { AuthStatus } from "../Authentication/AuthButton";
 import { usePathname, useRouter } from "next/navigation";
-import { getCurrentPathKey, retrieveCurrentPath,getStorageKey } from "@/lib/storage";
+import {
+  getCurrentPathKey,
+  retrieveCurrentPath,
+  getStorageKey,
+} from "@/lib/storage";
 import { useSession } from "next-auth/react";
 import { PathInformation } from "@/schemas/learningPathSchemas";
-
 
 interface NavbarProps {
   appName?: string;
@@ -20,24 +28,22 @@ function subscribeToStorage(callback: () => void) {
   };
 }
 
+export function getDeletePrevious(userId: string | null): boolean {
+  if (userId == null) return true;
+  const paths = localStorage.getItem(getStorageKey(userId));
+  const pathDict: Record<string, PathInformation> = paths
+    ? JSON.parse(paths)
+    : {};
 
-export function getDeletePrevious(userId:string | null):boolean{
-	if (userId==null) return true
-  const paths = localStorage.getItem(getStorageKey(userId))
-  const pathDict: Record<string, PathInformation> = paths ? JSON.parse(paths) : {}
+  const keys = pathDict ? Object.keys(pathDict) : [];
+  if (!pathDict || keys.length == 0) return false;
 
-  const keys = pathDict ? Object.keys(pathDict) : []
-  if (!pathDict || keys.length == 0)
-    return false
+  const pathCount = keys.length;
 
-  const pathCount=keys.length
+  if (pathCount > 3) return true;
 
-  if (pathCount>3)
-    return true
-
-  return false
+  return false;
 }
-
 
 export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
   const { data: session, status } = useSession();
@@ -45,13 +51,17 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
   const pathname = usePathname();
   const router = useRouter();
 
-  const getSnapshot= useCallback(()=>{
-	if (typeof window === "undefined") return false
-	const storage=userId?localStorage:sessionStorage
-	return Boolean(storage.getItem(getCurrentPathKey(userId)))
-  },[userId])
-  const [currentPath,setCurrentPath]=useState<PathInformation | null>(null)
-  const hasPath = useSyncExternalStore(subscribeToStorage, getSnapshot, () => false);
+  const getSnapshot = useCallback(() => {
+    if (typeof window === "undefined") return false;
+    const storage = userId ? localStorage : sessionStorage;
+    return Boolean(storage.getItem(getCurrentPathKey(userId)));
+  }, [userId]);
+  const [currentPath, setCurrentPath] = useState<PathInformation | null>(null);
+  const hasPath = useSyncExternalStore(
+    subscribeToStorage,
+    getSnapshot,
+    () => false,
+  );
   const [showStartOverConfirm, setShowStartOverConfirm] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -77,28 +87,31 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
   const isAuthenticated = status === "authenticated";
   const showNewPathButton =
-  hasPath &&
-  (pathname === "/learning-path" ||
-    (pathname === "/my-path" && isAuthenticated));
+    hasPath &&
+    (pathname === "/learning-path" ||
+      (pathname === "/my-path" && isAuthenticated));
 
   const navLinks = [
-    ...(isAuthenticated ? [{ name: "Learning Path", href: "/learning-path" },
-          { name: "My Paths", href: "/my-path" },] : [{ name: "Learning Path", href: "/learning-path" }]),
+    ...(isAuthenticated
+      ? [
+          { name: "Current Path", href: "/learning-path" },
+          { name: "My Paths", href: "/my-path" },
+        ]
+      : [{ name: "Current Path", href: "/learning-path" }]),
   ];
 
   useEffect(() => {
     async function fetchPath() {
-      const path = await retrieveCurrentPath(userId)
-      setCurrentPath(path ?? null)
+      const path = await retrieveCurrentPath(userId);
+      setCurrentPath(path ?? null);
     }
-    fetchPath()
-  }, [])
+    fetchPath();
+  }, []);
 
   return (
     <>
       <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/80 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 sm:px-12 lg:px-16">
-          
           {/* Logo & Main Nav Links */}
           <div className="flex items-center space-x-8 rtl:space-x-reverse">
             <Link
@@ -127,7 +140,8 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
                 </svg>
               </span>
               <span className="font-display text-lg font-semibold">
-                {appName}<span className="text-cyan-400">.</span>
+                {appName}
+                <span className="text-cyan-400">.</span>
               </span>
             </Link>
 
@@ -154,14 +168,23 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
 
           {/* Desktop Auth & Action Button */}
           <div className="hidden md:flex items-center space-x-4 rtl:space-x-reverse text-sm font-medium text-gray-700">
-            <AuthStatus />
-            {showNewPathButton ?  (
+            {showNewPathButton ? (
               <button
                 type="button"
-                onClick={() => setShowStartOverConfirm(true)}
+                // onClick={() => setShowStartOverConfirm(true)}
+                onClick={() => {
+                  if (userId) {
+                    router.push(
+                      `/career?deletePrevious=${getDeletePrevious(userId)}`,
+                    );
+                  } else {
+                    setShowStartOverConfirm(true);
+                  }
+                }}
                 className="inline-flex items-center cursor-pointer justify-center rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-black shadow-sm hover:bg-cyan-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-500 transition-all active:scale-95"
               >
-{pathname === "/my-path" ? "New Path" : "Start A New Path"}              </button>
+                {pathname === "/my-path" ? "New Path" : "Start A New Path"}{" "}
+              </button>
             ) : (
               <Link
                 href="/career"
@@ -170,6 +193,7 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
                 Build My Path
               </Link>
             )}
+            <AuthStatus />
           </div>
 
           {/* Mobile Hamburger Button */}
@@ -182,12 +206,32 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
               aria-label="Toggle navigation menu"
             >
               {isMobileMenuOpen ? (
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               ) : (
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
                 </svg>
               )}
             </button>
@@ -206,7 +250,9 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
                     href={link.href}
                     onClick={closeMobileMenu}
                     className={`text-base font-medium transition-colors px-2 py-1 rounded-md ${
-                      isActive ? "bg-cyan-50 text-cyan-600 font-semibold" : "text-gray-700 hover:bg-gray-50"
+                      isActive
+                        ? "bg-cyan-50 text-cyan-600 font-semibold"
+                        : "text-gray-700 hover:bg-gray-50"
                     }`}
                   >
                     {link.name}
@@ -215,21 +261,27 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
               })}
             </nav>
 
-            <div className="flex justify-start w-full px-2 py-1">
-              <AuthStatus />
-            </div>
-
             {/* Mobile Text-Style Buttons */}
-            {showNewPathButton ?  (
+            {showNewPathButton ? (
               <button
                 type="button"
+                // onClick={() => {
+                //   closeMobileMenu();
+                //   setShowStartOverConfirm(true);
+                // }}
                 onClick={() => {
                   closeMobileMenu();
-                  setShowStartOverConfirm(true);
+                  if (userId) {
+                    router.push(
+                      `/career?deletePrevious=${getDeletePrevious(userId)}`,
+                    );
+                  } else {
+                    setShowStartOverConfirm(true);
+                  }
                 }}
                 className="w-full text-left text-base font-medium text-gray-700 hover:text-cyan-600 hover:bg-gray-50 px-2 py-1 rounded-md transition-colors"
               >
-                Start A New Path
+                {pathname === "/my-path" ? "New Path" : "Start A New Path"}
               </button>
             ) : (
               <Link
@@ -240,6 +292,9 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
                 Build My Path
               </Link>
             )}
+            <div className="flex w-full justify-start border-t border-gray-200 px-2 py-4">
+              <AuthStatus />
+            </div>
           </div>
         )}
       </header>
@@ -260,13 +315,17 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
             aria-labelledby="start-over-title"
             className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl"
           >
-            <h2 id="start-over-title" className="text-lg font-semibold text-slate-900">
+            <h2
+              id="start-over-title"
+              className="text-lg font-semibold text-slate-900"
+            >
               Start a new learning path?
             </h2>
             {userId == null ? (
               <>
                 <p className="mt-3 text-sm text-slate-600">
-                  Create an account to save your current path and create additional learning paths.
+                  Create an account to save your current path and create
+                  additional learning paths.
                 </p>
                 <div className="mt-6 flex justify-end gap-3">
                   <button
@@ -280,7 +339,9 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
                     type="button"
                     onClick={() => {
                       setShowStartOverConfirm(false);
-                      router.push("/login?redirectTo=/learning-path?fromGuest=true");
+                      router.push(
+                        "/login?redirectTo=/learning-path?fromGuest=true",
+                      );
                     }}
                     className="rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-black hover:bg-cyan-300"
                   >
@@ -291,7 +352,8 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
             ) : (
               <>
                 <p className="mt-3 text-sm text-slate-600">
-                  Once your new path is generated, it will become your current path. Your progress on this path won&apos;t carry over.
+                  Once your new path is generated, it will become your current
+                  path. Your progress on this path won&apos;t carry over.
                 </p>
                 <div className="mt-6 flex justify-end gap-3">
                   <button
@@ -305,7 +367,9 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
                     type="button"
                     onClick={() => {
                       setShowStartOverConfirm(false);
-                      router.push(`/career?deletePrevious=${getDeletePrevious(userId)}`);
+                      router.push(
+                        `/career?deletePrevious=${getDeletePrevious(userId)}`,
+                      );
                     }}
                     className="rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-black hover:bg-cyan-300"
                   >
@@ -319,5 +383,5 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
       )}
     </>
   );
-}
-export default Navbar
+};
+export default Navbar;
