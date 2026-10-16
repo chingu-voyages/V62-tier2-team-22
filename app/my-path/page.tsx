@@ -13,7 +13,6 @@ import { retrievePath, updatePath } from "@/app/actions/path-actions";
 import type { PathInformation } from "@/schemas/learningPathSchemas";
 import {
   Trash2,
-  Plus,
   ArrowRight,
   CheckCircle2,
   X,
@@ -169,17 +168,7 @@ function PathsPage() {
             <p className="text-slate-500 text-sm mt-1">
               Every path you generate is saved here permanently.
             </p>
-          </div>
-
-          <div>
-            <button
-              onClick={() => router.push("/career")}
-              className="flex cursor-pointer items-center gap-2 px-5 py-2.5 text-sm font-medium text-black hover:bg-cyan-300 bg-cyan-400 rounded-xl transition-colors shadow-sm"
-            >
-              <Plus className="w-4 h-4" />
-              New path
-            </button>
-          </div>
+          </div>          
         </div>
        
         {paths.length === 0 ? (

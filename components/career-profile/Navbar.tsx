@@ -76,6 +76,10 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
 
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
   const isAuthenticated = status === "authenticated";
+  const showNewPathButton =
+  hasPath &&
+  (pathname === "/learning-path" ||
+    (pathname === "/my-path" && isAuthenticated));
 
   const navLinks = [
     ...(isAuthenticated ? [{ name: "Learning Path", href: "/learning-path" },
@@ -151,14 +155,13 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
           {/* Desktop Auth & Action Button */}
           <div className="hidden md:flex items-center space-x-4 rtl:space-x-reverse text-sm font-medium text-gray-700">
             <AuthStatus />
-            {pathname === "/learning-path" && hasPath ? (
+            {showNewPathButton ?  (
               <button
                 type="button"
                 onClick={() => setShowStartOverConfirm(true)}
                 className="inline-flex items-center cursor-pointer justify-center rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-black shadow-sm hover:bg-cyan-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-500 transition-all active:scale-95"
               >
-                Start A New Path
-              </button>
+{pathname === "/my-path" ? "New Path" : "Start A New Path"}              </button>
             ) : (
               <Link
                 href="/career"
@@ -217,7 +220,7 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
             </div>
 
             {/* Mobile Text-Style Buttons */}
-            {pathname === "/learning-path" && hasPath ? (
+            {showNewPathButton ?  (
               <button
                 type="button"
                 onClick={() => {
@@ -242,7 +245,7 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
       </header>
 
       {/* Confirmation Modal */}
-      {pathname === "/learning-path" && showStartOverConfirm && (
+      {showNewPathButton && showStartOverConfirm && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
           onClick={(event) => {
