@@ -27,7 +27,7 @@ export const Footer: React.FC<FooterProps> = ({ appName = "Masari" }) => {
             </p>
           </div>
 
-          <div className="flex space-x-6 text-sm text-gray-600 dark:text-gray-400">
+          <div className="flex w-full flex-wrap justify-center gap-x-4 gap-y-2 text-sm text-gray-600 dark:text-gray-400 md:w-auto">
             <Link href="/privacy-policy" className="hover:text-gray-900 dark:hover:text-white transition-colors">
               Privacy Policy
             </Link>
