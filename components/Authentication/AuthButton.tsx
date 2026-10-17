@@ -152,16 +152,28 @@ function AuthStatusContent(){
       <div ref={accountMenuRef} className="relative">
         <div className="hidden md:block">
           <button
-            type="button"
-            onClick={() => setIsAccountMenuOpen((open) => !open)}
-            aria-expanded={isAccountMenuOpen}
-            aria-haspopup="menu"
-            className={`inline-flex items-center justify-center border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 ${
-              isAccountMenuOpen ? "rounded-t-lg rounded-b-none" : "rounded-lg"
-            }`}
-          >
-            {session.user.name || "Account"}
-          </button>
+  type="button"
+  onClick={() => setIsAccountMenuOpen((open) => !open)}
+  aria-expanded={isAccountMenuOpen}
+  aria-haspopup="menu"
+  className={`inline-flex items-center gap-2 border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 ${
+    isAccountMenuOpen ? "rounded-t-lg rounded-b-none" : "rounded-lg"
+  }`}
+>
+  {session?.user?.image ? (
+    <img
+      src={session.user.image}
+      alt={session.user.name || "User Avatar"}
+      className="h-6 w-6 rounded-full object-cover"
+    />
+  ) : (
+    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-cyan-600 text-xs font-semibold text-white">
+      {session?.user?.name ? session.user.name.charAt(0).toUpperCase() : "A"}
+    </span>
+  )}
+
+  <span>{session?.user?.name || "Account"}</span>
+</button>
 
           {isAccountMenuOpen && (
             <div

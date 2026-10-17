@@ -52,7 +52,7 @@ export function LoginContent() {
 
       <Link
       href="/career"
-      className="block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-center text-sm font-medium text-gray-700 hover:bg-gray-50"
+      className="block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-center text-sm font-medium hover:text-black text-white hover:bg-gray-50"
       >
       Continue as a Guest
       </Link>
