@@ -12,10 +12,10 @@ interface StepGoalProps {
 
 const levels = [
   { id: "beginner", label: "Beginner" },
-  { id: "early_career", label: "Early career" },
-  { id: "mid_level", label: "Mid-level" },
-  { id: "senior", label: "Senior" },
-  { id: "switching", label: "Switching" },
+  // { id: "early_career", label: "Early career" },
+  { id: "intermediate", label: "Intermediate" },
+  { id: "advanced", label: "Advanced" },
+  // { id: "switching", label: "Switching" },
 ];
 
 export default function StepGoal({ formData, onChange, errors }: StepGoalProps) {
@@ -66,8 +66,20 @@ export default function StepGoal({ formData, onChange, errors }: StepGoalProps) 
                     : "bg-white border-slate-200 text-slate-700 hover:border-slate-300"
                 }`}
               >
-                <span className="text-sm font-medium">{lvl.label}</span>
-                {isSelected && <Check className="w-4 h-4 text-cyan-600" />}
+                <div>
+                  <span className="text-sm font-medium">{lvl.label}</span>
+                  <p className="mt-1 text-xs font-normal text-slate-500">
+                    {lvl.id === "beginner" &&
+                      "I'm new to this field or have very little relevant knowledge"}
+                    {lvl.id === "intermediate" &&
+                      "I have some relevant knowledge or practical experience"}
+                    {lvl.id === "advanced" &&
+                      "I have strong knowledge and experience in this field"}
+                  </p>
+                </div>
+                {isSelected && (
+                  <Check className="w-4 h-4 shrink-0 text-cyan-600" />
+                )}
               </button>
             );
           })}

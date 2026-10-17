@@ -166,17 +166,6 @@ export default function PrivacyPolicy() {
 						<li><strong>Usage Data:</strong> Website analytics and server logs retained up to 24 months.</li>
 					</ul>
 				</section>
-
-				{/* Contact Us */}
-				<section className="space-y-4 pt-6 border-t border-slate-200 dark:border-slate-800">
-					<h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-						Contact Us
-					</h2>
-					<p>If You have any questions about this Privacy Policy, you can contact us:</p>
-					<ul className="list-disc list-inside space-y-1 pl-2">
-						<li>By email: anas88893142@gmail.com</li>
-					</ul>
-				</section>
 			</div>
 
 			{/* Footer */}

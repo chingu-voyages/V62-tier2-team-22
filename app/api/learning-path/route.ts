@@ -37,7 +37,14 @@ export async function POST(request: Request) {
     let parsedResponse: unknown;
 
     try {
-      parsedResponse = JSON.parse(aiResponse);
+      const responseText = aiResponse.trim();
+      const fencedJson = responseText.match(
+        /^```(?:json)?[ \t]*\r?\n([\s\S]*?)\r?\n```[ \t]*$/i
+      );
+
+      parsedResponse = JSON.parse(
+        fencedJson ? fencedJson[1] : responseText
+      );
     } catch {
       return NextResponse.json(
         { error: "An error occured while generating the path." },
@@ -45,12 +52,14 @@ export async function POST(request: Request) {
       );
     }
 
-    const resResult =
-      learningPathResponseSchema.safeParse(parsedResponse);
+    const resResult = learningPathResponseSchema.safeParse(parsedResponse);
 
     if (!resResult.success) {
       return NextResponse.json(
-        { error: "Sorry, we couldn't generate your path, ensure your target role is valid." },
+        {
+          error:
+            "Sorry, we couldn't generate your path, ensure your target role is valid.",
+        },
         { status: 400 }
       );
     }
@@ -64,7 +73,7 @@ export async function POST(request: Request) {
           })
         );
 
-          return {
+        return {
           ...step,
           resources: checkedResources
             .filter((resource) => resource !== null)

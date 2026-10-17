@@ -2,7 +2,7 @@
 
 **From where you are to where you want to be — one meaningful step at a time.**
 
-Masari is an AI-powered career planning app that helps learners turn their career goals into actionable learning paths. Share your target role, current experience, existing skills, available study time, and preferred learning style. Masari uses this information to generate an ordered learning path with estimated time commitments and links to relevant learning resources.
+Masari is an AI-powered career planning full-stack app that helps learners turn their career goals into actionable learning paths. Share your target role, current experience, existing skills, available study time, and preferred learning style. Masari uses this information to generate an ordered learning path with estimated time commitments and links to relevant learning resources.
 
 ## Contents
 
@@ -23,7 +23,8 @@ Masari is an AI-powered career planning app that helps learners turn their caree
 - **Curated learning resources:** Explore courses, articles, videos, and documentation relevant to each learning step.
 - **Learning path details:** Expand each step to view its description, why it matters, estimated time, and suggested resources.
 - **Progress tracking:** Mark individual steps as complete or incomplete and view your completion percentage and learning record.
-- **Google and GitHub sign-in:** Authenticate to save paths for later access.
+- **Google and GitHub sign-in:** Sign in to save learning paths for later access, and revisit or delete them from the My Paths page.
+- **Guest access:** Create and use a personalized learning path without signing in. The guest path is kept for the current browser-tab session and can be saved to your account when you sign in.
 - **Responsive interface:** Use Masari on desktop and mobile screens.
 
 ## How it works
@@ -40,7 +41,7 @@ Masari is an AI-powered career planning app that helps learners turn their caree
 
 ## Live Demo
 
-Try Masari: [Open the live application](https://v62-tier2-team-22-pk61hq8st-anas88893142-7745.vercel.app/)
+Try Masari: [Open the live application](https://v62-tier2-team-22.vercel.app/)
 
 ## Technology
 
@@ -161,7 +162,7 @@ Use the PostgreSQL connection strings provided by your database host. The sample
 
 Masari stores each learning path with its ID, creation date, completion status, original profile, and ordered learning steps. The Prisma model is `LearningPath`; profile and step details are stored as JSON.
 
-- **Guests:** the active path is stored in `sessionStorage` and is available during the current browser tab's session.
+- **Guests:** the active path is stored in `sessionStorage` for the current browser-tab session. When you sign in, the app saves the guest path to your account.
 - **Signed-in users:** paths are stored in browser `localStorage` and written to PostgreSQL. Completion updates are saved to the browser and, for signed-in users, synchronized to the database.
 - **Authentication:** NextAuth uses JWT sessions and Google/GitHub providers.
 

@@ -69,12 +69,14 @@ export default function AnalysisEngine({
           <span className="text-xs font-semibold tracking-widest text-cyan-400 uppercase">
             MASARI ANALYSIS ENGINE
           </span>
-          <h1 className="text-3xl md:text-4xl font-bold text-white mt-3 mb-3 tracking-tight">
-            Constructing your route to <span className="uppercase">{targetRole}</span>
+          <h1 className="text-3xl md:text-4xl font-bold text-white mt-3 mb-3 tracking-tight font-[family-name:var(--font-space-grotesk)]">
+            Constructing your route to{" "}
+            <span className="uppercase text-cyan-400">{targetRole}</span>
           </h1>
 
           <p className="text-slate-400 text-sm max-w-lg mx-auto mb-10 leading-relaxed">
-            Your answers are being translated into a capability model and realistic sequence.
+            Your answers are being translated into a capability model and
+            realistic sequence.
           </p>
 
           <div className="bg-[#0b132b]/60 backdrop-blur-md border border-slate-800/80 rounded-2xl p-6 md:p-8 text-left shadow-2xl divide-y divide-slate-800/60">
@@ -94,8 +96,8 @@ export default function AnalysisEngine({
                         isDone
                           ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40"
                           : isCurrent
-                          ? "bg-cyan-500/20 text-cyan-400 border border-cyan-400/60 shadow-[0_0_10px_rgba(34,211,238,0.2)]"
-                          : "border border-slate-700 text-slate-500 bg-slate-900/40"
+                            ? "bg-cyan-500/20 text-cyan-400 border border-cyan-400/60 shadow-[0_0_10px_rgba(34,211,238,0.2)]"
+                            : "border border-slate-700 text-slate-500 bg-slate-900/40"
                       }`}
                     >
                       {isDone ? (
@@ -112,8 +114,8 @@ export default function AnalysisEngine({
                         isCurrent
                           ? "text-white font-medium"
                           : isDone
-                          ? "text-slate-300"
-                          : "text-slate-500"
+                            ? "text-slate-300"
+                            : "text-slate-500"
                       }`}
                     >
                       {label}

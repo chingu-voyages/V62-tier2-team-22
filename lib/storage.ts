@@ -122,3 +122,79 @@ export async function retrieveCurrentPath(userId:string|null):Promise<PathInform
 		return null
 	}
 }
+
+export function retrieveAllUserPaths(userId: string | null): PathInformation[] {
+    if (typeof window === "undefined") return [];
+
+    try {
+        const storageKey = getStorageKey(userId);
+        
+        if (userId === null) {
+            const stored = sessionStorage.getItem(storageKey);
+            return stored ? JSON.parse(stored) : [];
+        }
+
+        const pathsJson = localStorage.getItem(storageKey);
+        if (!pathsJson) return [];
+
+        const pathDictionary: Record<string, PathInformation> = JSON.parse(pathsJson);
+        return Object.values(pathDictionary);
+    } catch (e) {
+        console.error("Failed to retrieve all user paths:", e);
+        return [];
+    }
+}
+
+export async function deleteUserPath(pathId: string, userId: string | null) {
+    if (typeof window === "undefined") return;
+
+    try {
+        if (userId === null) {
+            const storageKey = getStorageKey(userId);
+            const stored = sessionStorage.getItem(storageKey);
+            if (stored) {
+                let paths: PathInformation[] = JSON.parse(stored);
+                paths = paths.filter((p) => p.id !== pathId);
+                sessionStorage.setItem(storageKey, JSON.stringify(paths));
+            }
+            return;
+        }
+
+        const storageKey = getStorageKey(userId);
+        const pathsJson = localStorage.getItem(storageKey);
+        
+        if (pathsJson) {
+            const pathDictionary: Record<string, PathInformation> = JSON.parse(pathsJson);
+            if (pathDictionary[pathId]) {
+                delete pathDictionary[pathId];
+                localStorage.setItem(storageKey, JSON.stringify(pathDictionary));
+            }
+        }
+
+        const currentPathKey = getCurrentPathKey(userId);
+		const currentPathId = localStorage.getItem(currentPathKey);
+		const remainingJson = localStorage.getItem(storageKey);
+		const remainingPaths: Record<string, PathInformation> = remainingJson
+			? JSON.parse(remainingJson)
+			: {};
+		const remainingIds = Object.keys(remainingPaths);
+
+		if (remainingIds.length === 0) {
+			localStorage.removeItem(currentPathKey);
+		} else if (!currentPathId || !Object.hasOwn(remainingPaths, currentPathId)) {
+			localStorage.setItem(
+				currentPathKey,
+				remainingIds[remainingIds.length - 1]
+			);
+		}
+
+		window.dispatchEvent(new Event("storage"));
+
+        await DatabaseUtils.deletePath(pathId).catch((err) => {
+            console.error("Failed to delete path from database:", err);
+        });
+
+    } catch (e) {
+        console.error("Failed to delete user path:", e);
+    }
+}

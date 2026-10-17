@@ -1,6 +1,8 @@
 import Link from "next/link";
 import GridBackground from "@/components/career-profile/GridBackground";
-export default function Home() {
+import { auth } from "@/lib/auth";
+export default async function Home() {
+  const session = await auth();
   return (
    <div className="bg-[#040914] text-white bg-grid-pattern relative flex flex-col justify-between overflow-x-hidden">
       {/* Background Glow Effect */}
@@ -24,7 +26,7 @@ export default function Home() {
 
             <div className="flex flex-wrap items-center gap-4 mb-8">
               <Link 
-                href="/career" 
+                href={session?.user ? "/career" : "/login?redirectTo=%2Fcareer"}
                 className="bg-cyan-400 hover:bg-cyan-300 text-slate-950  px-6 py-3 rounded-md flex items-center gap-2 transition cursor-pointer text-sm sm:text-base"
               >
                 Map my career path &rarr;
