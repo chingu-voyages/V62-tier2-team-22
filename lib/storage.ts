@@ -172,10 +172,23 @@ export async function deleteUserPath(pathId: string, userId: string | null) {
         }
 
         const currentPathKey = getCurrentPathKey(userId);
-        const currentPathId = localStorage.getItem(currentPathKey);
-        if (currentPathId === pathId) {
-            localStorage.removeItem(currentPathKey);
-        }
+		const currentPathId = localStorage.getItem(currentPathKey);
+		const remainingJson = localStorage.getItem(storageKey);
+		const remainingPaths: Record<string, PathInformation> = remainingJson
+			? JSON.parse(remainingJson)
+			: {};
+		const remainingIds = Object.keys(remainingPaths);
+
+		if (remainingIds.length === 0) {
+			localStorage.removeItem(currentPathKey);
+		} else if (!currentPathId || !Object.hasOwn(remainingPaths, currentPathId)) {
+			localStorage.setItem(
+				currentPathKey,
+				remainingIds[remainingIds.length - 1]
+			);
+		}
+
+		window.dispatchEvent(new Event("storage"));
 
         await DatabaseUtils.deletePath(pathId).catch((err) => {
             console.error("Failed to delete path from database:", err);

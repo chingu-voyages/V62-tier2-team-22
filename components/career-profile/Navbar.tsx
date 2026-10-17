@@ -91,14 +91,14 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
     (pathname === "/learning-path" ||
       (pathname === "/my-path" && isAuthenticated));
 
-  const navLinks = isAuthenticated
-  ? [
-      { name: "Current Path", href: "/learning-path" },
-      { name: "My Paths", href: "/my-path" },
-    ]
-  : hasPath
+  const navLinks = [
+  ...(hasPath
     ? [{ name: "Current Path", href: "/learning-path" }]
-    : [];
+    : []),
+  ...(isAuthenticated
+    ? [{ name: "My Paths", href: "/my-path" }]
+    : []),
+];
 
   useEffect(() => {
     async function fetchPath() {
