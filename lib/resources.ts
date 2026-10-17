@@ -36,8 +36,6 @@ export function getPublicResourceUrl(value: string): URL | null {
   }
 }
 
-
-
 function isYouTubeUrl(url: URL): boolean {
   return [
     "youtube.com",
@@ -112,42 +110,59 @@ export async function isResourceAvailable(value: string): Promise<boolean> {
 
   try {
     for (let redirects = 0; redirects <= 3; redirects++) {
-        if (isYouTubeUrl(url)) {
-  const videoId = getYouTubeVideoId(url);
-  if (!videoId) return false;
+      if (isYouTubeUrl(url)) {
+        const videoId = getYouTubeVideoId(url);
+        if (!videoId) return false;
 
-  const metadataUrl = new URL("https://www.youtube.com/oembed");
+        const metadataUrl = new URL("https://www.youtube.com/oembed");
+        metadataUrl.searchParams.set(
+          "url",
+          `https://www.youtube.com/watch?v=${videoId}`
+        );
+        metadataUrl.searchParams.set("format", "json");
 
-  metadataUrl.searchParams.set(
-    "url",
-    `https://www.youtube.com/watch?v=${videoId}`
-  );
-  metadataUrl.searchParams.set("format", "json");
+        const metadataResponse = await resourceFetch(metadataUrl, {
+          method: "GET",
+          redirect: "error",
+          dispatcher,
+          signal,
+        });
 
-  const metadataResponse = await resourceFetch(metadataUrl, {
-    method: "GET",
-    redirect: "error",
-    dispatcher,
-    signal,
-  });
+        if (!metadataResponse.ok) {
+          await metadataResponse.body?.cancel();
+          return false;
+        }
 
-  if (!metadataResponse.ok) {
-    await metadataResponse.body?.cancel();
-    return false;
-  }
+        const metadata: unknown = await metadataResponse.json();
 
-  const metadata: unknown = await metadataResponse.json();
+        if (
+          typeof metadata !== "object" ||
+          metadata === null ||
+          !("type" in metadata) ||
+          metadata.type !== "video" ||
+          !("title" in metadata) ||
+          typeof metadata.title !== "string"
+        ) {
+          return false;
+        }
 
-  return (
-    typeof metadata === "object" &&
-    metadata !== null &&
-    "type" in metadata &&
-    metadata.type === "video" &&
-    "title" in metadata &&
-    typeof metadata.title === "string" &&
-    metadata.title.trim().length > 0
-  );
-}
+        const title = metadata.title.trim();
+        const author =
+          "author_name" in metadata &&
+          typeof metadata.author_name === "string"
+            ? metadata.author_name
+            : "";
+
+        if (!title) return false;
+
+        const looksLikeMusic =
+          /\b(official (music )?video|music video|lyrics?|karaoke|remaster(ed)?)\b/i.test(
+            title
+          ) || /\bvevo\b| - Topic$/i.test(author);
+
+        return !looksLikeMusic;
+      }
+
       let response = await resourceFetch(url, {
         method: "HEAD",
         redirect: "manual",
@@ -155,7 +170,10 @@ export async function isResourceAvailable(value: string): Promise<boolean> {
         signal,
       });
 
-      if (response.status === 405 || response.status === 501) {
+      if (
+        !response.ok &&
+        ![301, 302, 303, 307, 308].includes(response.status)
+      ) {
         await response.body?.cancel();
 
         response = await resourceFetch(url, {
@@ -163,7 +181,6 @@ export async function isResourceAvailable(value: string): Promise<boolean> {
           redirect: "manual",
           dispatcher,
           signal,
-          headers: { Range: "bytes=0-1023" },
         });
       }
 
