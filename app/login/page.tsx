@@ -44,7 +44,18 @@ export function LoginContent() {
 
       {/* Authentication Buttons (Google & GitHub) */}
       <SignInButtons redirectTo={redirectTo}/>
+      <div className="my-6 flex items-center gap-3 text-xs font-medium text-gray-500">
+      <span className="h-px flex-1 bg-gray-200" />
+      <span>OR</span>
+      <span className="h-px flex-1 bg-gray-200" />
+      </div>
 
+      <Link
+      href="/career"
+      className="block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-center text-sm font-medium text-gray-700 hover:bg-gray-50"
+      >
+      Continue as a Guest
+      </Link>
       {/* Footer / Links */}
       <div className="mt-6 text-center text-xs text-gray-500 dark:text-gray-400">
         By signing in, you agree to our{" "}

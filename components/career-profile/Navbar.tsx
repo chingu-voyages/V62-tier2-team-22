@@ -91,14 +91,14 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
     (pathname === "/learning-path" ||
       (pathname === "/my-path" && isAuthenticated));
 
-  const navLinks = [
-    ...(isAuthenticated
-      ? [
-          { name: "Current Path", href: "/learning-path" },
-          { name: "My Paths", href: "/my-path" },
-        ]
-      : [{ name: "Current Path", href: "/learning-path" }]),
-  ];
+  const navLinks = isAuthenticated
+  ? [
+      { name: "Current Path", href: "/learning-path" },
+      { name: "My Paths", href: "/my-path" },
+    ]
+  : hasPath
+    ? [{ name: "Current Path", href: "/learning-path" }]
+    : [];
 
   useEffect(() => {
     async function fetchPath() {
@@ -183,14 +183,14 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
                 }}
                 className="inline-flex items-center cursor-pointer justify-center rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-black shadow-sm hover:bg-cyan-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-500 transition-all active:scale-95"
               >
-                {pathname === "/my-path" ? "New Path" : "Start A New Path"}{" "}
+                Start A New Path
               </button>
             ) : (
               <Link
-                href="/career"
+                href={isAuthenticated ? "/career" : "/login?redirectTo=%2Fcareer"}
                 className="inline-flex items-center justify-center rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-black shadow-sm hover:bg-cyan-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-500 transition-all active:scale-95"
               >
-                Build My Path
+                {isAuthenticated && hasPath ? "Start A New Path" : "Build My Path"}
               </Link>
             )}
             <AuthStatus />
@@ -281,15 +281,15 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
                 }}
                 className="w-full text-left text-base font-medium text-gray-700 hover:text-cyan-600 hover:bg-gray-50 px-2 py-1 rounded-md transition-colors"
               >
-                {pathname === "/my-path" ? "New Path" : "Start A New Path"}
+                Start A New Path
               </button>
             ) : (
               <Link
-                href="/career"
+                href={isAuthenticated ? "/career" : "/login?redirectTo=%2Fcareer"}
                 onClick={closeMobileMenu}
                 className="w-full text-left text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 px-2 py-1 rounded-md transition-colors"
               >
-                Build My Path
+                {isAuthenticated && hasPath ? "Start A New Path" : "Build My Path"}
               </Link>
             )}
             <div className="flex w-full justify-start border-t border-gray-200 px-2 py-4">
@@ -373,7 +373,7 @@ export const Navbar: React.FC<NavbarProps> = ({ appName = "Masari" }) => {
                     }}
                     className="rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-black hover:bg-cyan-300"
                   >
-                    Start new path
+                    Start A New Path
                   </button>
                 </div>
               </>
